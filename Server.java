@@ -11,12 +11,37 @@ public class Server {
 	public static void main(String[] args) throws Exception {
 		System.out.println("The server is running."); 
         ServerSocket listener = new ServerSocket(sPort);
-		int clientNum = 1;
+		String clientNum = "1";
         try {
+
+			// ----- TODO: Read Common.cfg
+
+			// ----- TODO: Read PeerInfo.cfg
+			FileReader fileReader = new FileReader("PeerInfo.cfg");
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			
+			String line = null;
+			String peerID = "";
+			String hostname = "";
+			String port = "";
+			String hasFile = "";
+
+			while ((line = bufferedReader.readLine()) != null) {
+				StringTokenizer tokens = new StringTokenizer(line);
+				if (tokens.countTokens() < 4) {
+					// throw too few tokens
+				} else if (tokens.countTokens() > 4) {
+					// throw too many tokens
+				}
+				peerID = tokens.nextToken();
+				hostname = tokens.nextToken();
+				port = tokens.nextToken();
+				hasFile = tokens.nextToken();
+			}
+			
             while(true) {
-                new Handler(listener.accept(),clientNum).start();
+                new Handler(listener.accept(),clientNum, "localhost").start();
 				System.out.println("Client "  + clientNum + " is connected!");
-				clientNum++;
     		}
         } finally {
     		listener.close();
@@ -29,20 +54,30 @@ public class Server {
 	* loop and are responsible for dealing with a single client's requests.
 	*/
 	private static class Handler extends Thread {
-		private String message;    //message received from the client
-		private String MESSAGE;    //uppercase message send to the client
+		private String message;    			//message received from the client
+		private String MESSAGE;    			//uppercase message send to the client
 		private Socket connection;
-		private ObjectInputStream in;	//stream read from the socket
-		private ObjectOutputStream out;    //stream write to the socket
-		private int no;		//The index number of the client
+		private ObjectInputStream in;		//stream read from the socket
+		private ObjectOutputStream out;    	//stream write to the socket
+		private String peerID;				//The index number of the client
+		private String hostname;
 
-		public Handler(Socket connection, int no) {
+		public Handler(Socket connection, String peerID, String hostname) {
 			this.connection = connection;
-			this.no = no;
+			this.peerID = peerID;
+			this.hostname = hostname;
 		}
 
 		public void run() {
 			try{
+
+				/* PROJECT STUFF */
+				String peerProcessName = "java peerProcess";
+				String peerProcessArguments = peerID;
+				String workingDir = System.getProperty("user.dir");
+				Runtime.getRuntime().exec("ssh " + hostname + " cd " + workingDir + " ; " + peerProcessName + " " + peerProcessArguments);
+
+				/* SAMPLE CODE STUFF */
 				//initialize Input and Output streams
 				out = new ObjectOutputStream(connection.getOutputStream());
 				out.flush();
@@ -52,7 +87,7 @@ public class Server {
 						//receive the message sent from the client
 						message = (String)in.readObject();
 						//show the message to the user
-						System.out.println("Receive message: " + message + " from client " + no);
+						System.out.println("Receive message: " + message + " from client " + peerID);
 						//Capitalize all letters in the message
 						MESSAGE = message.toUpperCase();
 						//send MESSAGE back to the client
@@ -64,7 +99,7 @@ public class Server {
 				}
 			}
 			catch(IOException ioException){
-				System.out.println("Disconnect with Client " + no);
+				System.out.println("Disconnect with Client " + peerID);
 			}
 			finally{
 				//Close connections
@@ -74,7 +109,7 @@ public class Server {
 					connection.close();
 				}
 				catch(IOException ioException){
-					System.out.println("Disconnect with Client " + no);
+					System.out.println("Disconnect with Client " + peerID);
 				}
 			}
 		}
@@ -84,7 +119,7 @@ public class Server {
 			try {
 				out.writeObject(msg);
 				out.flush();
-				System.out.println("Send message: " + msg + " to Client " + no);
+				System.out.println("Send message: " + msg + " to Client " + peerID);
 			}
 			catch (IOException ioException) {
 				ioException.printStackTrace ();
