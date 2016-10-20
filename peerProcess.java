@@ -4,7 +4,7 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
 
-public class Client {
+public class peerProcess {
 	Socket requestSocket;           //socket connect to the server
 	ObjectOutputStream out;         //stream write to the socket
  	ObjectInputStream in;          //stream read from the socket
@@ -83,6 +83,10 @@ public class Client {
 	//main method
 	public static void main(String args[])
 	{
+		int peerID = 0;
+		for (int i=0; i<args[0].length(); i++) {
+			peerID = peerID * 10 + (int)args[0].charAt(i);
+		}
 		Client client = new Client();
 		client.run();
 	}
