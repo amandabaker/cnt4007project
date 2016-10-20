@@ -2,11 +2,12 @@ import java.net.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Server {
 
-	private static final int sPort = 8000;   //The server will be listening on this port number
+	private static final int sPort = 80;   //The server will be listening on this port number
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("The server is running."); 
@@ -29,8 +30,10 @@ public class Server {
      	* loop and are responsible for dealing with a single client's requests.
      	*/
     	private static class Handler extends Thread {
-        	private String message;    //message received from the client
-		private String MESSAGE;    //uppercase message send to the client
+        	//private String message;    //message received from the client
+    		private byte [] message;
+		//private String MESSAGE;    //uppercase message send to the client
+    	private byte [] MESSAGE;
 		private Socket connection;
         	private ObjectInputStream in;	//stream read from the socket
         	private ObjectOutputStream out;    //stream write to the socket
@@ -51,11 +54,16 @@ public class Server {
 				while(true)
 				{
 					//receive the message sent from the client
-					message = (String)in.readObject();
+					message = (byte[])in.readObject();
+					//message = (String)in.readObject();
+					//convert message to string
+					String bytestring = new String(message, StandardCharsets.UTF_8);
+					
 					//show the message to the user
-					System.out.println("Receive message: " + message + " from client " + no);
+					System.out.println("Receive message: " + bytestring + " from client " + no);
 					//Capitalize all letters in the message
-					MESSAGE = message.toUpperCase();
+					//MESSAGE = message.toUpperCase();
+					MESSAGE = message;
 					//send MESSAGE back to the client
 					sendMessage(MESSAGE);
 				}
@@ -81,7 +89,7 @@ public class Server {
 	}
 
 	//send a message to the output stream
-	public void sendMessage(String msg)
+	public void sendMessage(byte [] msg)
 	{
 		try{
 			out.writeObject(msg);
