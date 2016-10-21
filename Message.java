@@ -37,4 +37,25 @@ public class Message {
         }
         out.flush();
     }
+
+    int getLength () {
+        return payload.length + 4;
+    }
+    void setType (int type) {
+        if (type < 8 && type > 0) {
+            this.type = type;
+        }
+    }
+
+    int getType () {
+        return type;
+    }
+
+    void setPayload (bit[] payload) {
+        this.payload = payload;
+    }
+
+    bit[] getPayload () {
+        return payload;
+    }
 }
