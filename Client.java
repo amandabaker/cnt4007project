@@ -178,6 +178,7 @@ public class Client {
 
 	void sendChoke () {
 		Message msg = new Message();
+		msg.setLength(4);
 		msg.setType(0);
 		msg.setPayload(null);
 		msg.send();
@@ -185,6 +186,7 @@ public class Client {
 
 	void sendUnchoke () {
 		Message msg = new Message();
+		msg.setLength(4);
 		msg.setType(1);
 		msg.setPayload(null);
 		msg.send();
@@ -192,6 +194,7 @@ public class Client {
 
 	void sendInterested () {
 		Message msg = new Message();
+		msg.setLength(4);
 		msg.setType(2);
 		msg.setPayload(null);
 		msg.send();
@@ -199,6 +202,7 @@ public class Client {
 
 	void sendNotInterested () {
 		Message msg = new Message();
+		msg.setLength(4);
 		msg.setType(3);
 		msg.setPayload(null);
 		msg.send();
@@ -206,6 +210,7 @@ public class Client {
 
 	void sendHave (int pieceIndex) {
 		Message msg = new Message();
+		msg.setLength(8);
 		msg.setType(4);
 		msg.setPayload((byte)pieceIndex);
 		msg.send();
@@ -214,13 +219,15 @@ public class Client {
 	void sendBitfield () {
 		// has payload: complicated
 		Message msg = new Message();
+		msg.setLength(0);			// MAKE LENGTH MAKE SENSE
 		msg.setType(5);
-		msg.setPayload(null);
+		msg.setPayload(null);		// ADD BITFIELD CONTENT
 		msg.send();
 	}
 
 	void sendRequest (int pieceIndex) {
 		Message msg = new Message();
+		msg.setLength(8);
 		msg.setType(6);
 		msg.setPayload((byte)pieceIndex);
 		msg.send();
@@ -229,8 +236,9 @@ public class Client {
 	void sendPiece (int pieceIndex) {
 		// ADD PIECE CONTENT
 		Message msg = new Message();
+		msg.setLength(4);					// SET LENGTH APPROPRIATELY 
 		msg.setType(7);
-		msg.setPayload((byte)pieceIndex); // AND PIECE CONTENT!
+		msg.setPayload((byte)pieceIndex); 	// AND PIECE CONTENT!
 		msg.send();
 	}
 
