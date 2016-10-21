@@ -18,7 +18,7 @@ public class PeerProcess extends Thread {
 	final int BITFIELD 			= 5;
 	final int REQUEST 			= 6;
 	final int PIECE 			= 7;
-	
+
 	private int peerID;						//id for this peer
 	private Socket requestSocket;           //socket to connect to the server
 	public ServerSocket listener;			//will fix privacy later
@@ -46,7 +46,7 @@ public class PeerProcess extends Thread {
 		
 		// Hardcoding first peer to start for now
 		if (peerID == 1001) {
-			
+		
 			//spin up a server socket, port hardcoded for now
 			spinServer(8080);
 
@@ -291,6 +291,43 @@ public class PeerProcess extends Thread {
 		Client client = new Client();
 		client.run();
 	}
+
+	// Reading from files
+	/*
+	// ----- TODO: Read Common.cfg
+
+	// ----- TODO: Read PeerInfo.cfg
+	FileReader fileReader = new FileReader("PeerInfo.cfg");
+	BufferedReader bufferedReader = new BufferedReader(fileReader);
+	
+	String line = null;
+	String peerID = "";
+	String hostname = "";
+	String port = "";
+	String hasFile = "";
+	//int sPort = 8000;
+	int i = 0;
+	
+	while ((line = bufferedReader.readLine()) != null) {
+		System.out.println(line + "\n");
+		listenerArr[i] = new ServerSocket(sPort++
+		);
+		StringTokenizer tokens = new StringTokenizer(line);
+		if (tokens.countTokens() < 4) {
+			// throw too few tokens
+		} else if (tokens.countTokens() > 4) {
+			// throw too many tokens
+		}
+		peerID = tokens.nextToken();
+		hostname = tokens.nextToken();
+		port = tokens.nextToken();
+		hasFile = tokens.nextToken();
+		System.out.println("almost new\n");
+		while (true) {
+			new Handler (listenerArr[i++].accept(),peerID, hostname).start();
+			System.out.println("end\n");
+		}
+	}*/
 
 }
 
