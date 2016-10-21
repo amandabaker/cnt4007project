@@ -15,6 +15,12 @@ public class Message {
     private int peerID;         // peerID
     private byte[] payload;     // payload of message
 
+    public Message () {
+        length = 0;
+        type = 0;
+        payload = null;
+    }
+
     public Message (int type, byte[] payload) {
         length = 0;
         this.type = type;
@@ -38,24 +44,28 @@ public class Message {
         out.flush();
     }
 
-    int getLength () {
-        return payload.length + 4;
+    public void setLength (int length) {
+        this.length = length;
     }
-    void setType (int type) {
+
+    public int getLength () {
+        return length;
+    }
+    public void setType (int type) {
         if (type < 8 && type > 0) {
             this.type = type;
         }
     }
 
-    int getType () {
+    public int getType () {
         return type;
     }
 
-    void setPayload (bit[] payload) {
+    public void setPayload (byte[] payload) {
         this.payload = payload;
     }
 
-    bit[] getPayload () {
+    public byte[] getPayload () {
         return payload;
     }
 }
