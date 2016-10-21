@@ -51,13 +51,9 @@ public class Client {
 				System.out.print("Hello, please input a sentence: ");
 				//read a sentence from the standard input
 				message = bufferedReader.readLine();
-				//translate to bytes --temporary
-
-				//translate from string to byte
-				byte [] bmessage = message.getBytes();
 				
 				//Send the sentence to the server
-				sendMessage(bmessage);
+				out.writeObject(message);
 				//Receive the upperCase sentence from the server
 				MESSAGE = (byte[])in.readObject();
 				//show the message to the user
@@ -108,9 +104,10 @@ public class Client {
 	{
 		try{
 			//stream write the message
-			outStream.write((byte)"P2PFILESHARINGJPROJ");
+			String header = "P2PFILESHARINGJPROJ";
+			outStream.write(header.getBytes());
 			outStream.write((byte)0);
-			outStream.write((byte)peerid);
+			outStream.write(peerid.getBytes());
 		
 			outStream.flush();
 		}
@@ -136,41 +133,42 @@ public class Client {
 		
 	}
 
+	// Check the type of the recieved message and act accordingly
 	void messageType(Message msg) 
 	{
 		//check message type bit
-		/
 		int type = msg.getType();
 
-		if (type == 0) 
+		if (type == CHOKE) 
 		{
-			//choke
+			// choke
 		}
-		if (type == 1)
+		if (type == UNCHOKE)
 		{
-			//unchoke
+			// unchoke
+			// send requests!
 		}
-		if (type == 2) 
+		if (type == INTERESTED) 
 		{
 			//interested
 		}
-		if (type == 3) 
+		if (type == NOT_INTERESTED) 
 		{
 			//not interested
 		}
-		if (type == 4) 
+		if (type == HAVE) 
 		{
 			//have
 		}
-		if (type == 5) 
+		if (type == BITFIELD) 
 		{
 			//bitfield
 		}
-		if (type == 6) 
+		if (type == REQUEST) 
 		{
 			//request
 		}
-		if (type == 7)
+		if (type == PIECE)
 		{
 			//piece
 		}
@@ -179,67 +177,88 @@ public class Client {
 	void sendChoke () {
 		Message msg = new Message();
 		msg.setLength(4);
-		msg.setType(0);
+		msg.setType(CHOKE);
 		msg.setPayload(null);
-		msg.send();
+		msg.send(requestSocket);
 	}
 
 	void sendUnchoke () {
 		Message msg = new Message();
 		msg.setLength(4);
-		msg.setType(1);
+		msg.setType(UNCHOKE);
 		msg.setPayload(null);
-		msg.send();
+		msg.send(requestSocket);
 	}
 
 	void sendInterested () {
 		Message msg = new Message();
 		msg.setLength(4);
-		msg.setType(2);
+		msg.setType(INTERESTED);
 		msg.setPayload(null);
-		msg.send();
+		msg.send(requestSocket);
 	}
 
 	void sendNotInterested () {
 		Message msg = new Message();
 		msg.setLength(4);
-		msg.setType(3);
+		msg.setType(NOT_INTERESTED));
 		msg.setPayload(null);
-		msg.send();
+		msg.send(requestSocket);
 	}
 
 	void sendHave (int pieceIndex) {
+		byte[] bPieceIndex = new byte [4];
+		// Convert pieceIndex from int to byte[]
+		for (int i=bPieceIndex.length-1; i>=0; i--) {
+			bPieceIndex[i] = pieceIndex % 12;
+			pieceIndex /= 12;
+		}
+
 		Message msg = new Message();
 		msg.setLength(8);
-		msg.setType(4);
-		msg.setPayload((byte)pieceIndex);
-		msg.send();
+		msg.setType(HAVE);
+		msg.setPayload((byte[])pieceIndex);
+		msg.send(requestSocket);
 	}
 
 	void sendBitfield () {
 		// has payload: complicated
 		Message msg = new Message();
 		msg.setLength(0);			// MAKE LENGTH MAKE SENSE
-		msg.setType(5);
+		msg.setType(BITFIELD);
 		msg.setPayload(null);		// ADD BITFIELD CONTENT
-		msg.send();
+		msg.send(requestSocket);
 	}
 
 	void sendRequest (int pieceIndex) {
+		byte[] bPieceIndex = new byte [4];
+		// Convert pieceIndex from int to byte[]
+		for (int i=bPieceIndex.length-1; i>=0; i--) {
+			bPieceIndex[i] = pieceIndex % 12;
+			pieceIndex /= 12;
+		}
+
 		Message msg = new Message();
 		msg.setLength(8);
-		msg.setType(6);
-		msg.setPayload((byte)pieceIndex);
-		msg.send();
+		msg.setType(REQUEST);
+		msg.setPayload(bPieceIndex);
+		msg.send(requestSocket);
 	}
 
 	void sendPiece (int pieceIndex) {
 		// ADD PIECE CONTENT
+		byte[] bPieceIndex = new byte [4];
+		// Convert pieceIndex from int to byte[]
+		for (int i=bPieceIndex.length-1; i>=0; i--) {
+			bPieceIndex[i] = pieceIndex % 12;
+			pieceIndex /= 12;
+		}
+
 		Message msg = new Message();
-		msg.setLength(4);					// SET LENGTH APPROPRIATELY 
-		msg.setType(7);
-		msg.setPayload((byte)pieceIndex); 	// AND PIECE CONTENT!
-		msg.send();
+		msg.setLength(4);				// SET LENGTH APPROPRIATELY 
+		msg.setType(PIECE);
+		msg.setPayload((bPieceIndex); 	// AND PIECE CONTENT!
+		msg.send(requestSocket);
 	}
 
 	//main method
