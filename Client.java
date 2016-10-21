@@ -141,7 +141,7 @@ public class Client {
 		//check message type bit
 		/
 		int type = msg.getType();
-		
+
 		if (type == 0) 
 		{
 			//choke
@@ -174,6 +174,64 @@ public class Client {
 		{
 			//piece
 		}
+	}
+
+	void sendChoke () {
+		Message msg = new Message();
+		msg.setType(0);
+		msg.setPayload(null);
+		msg.send();
+	}
+
+	void sendUnchoke () {
+		Message msg = new Message();
+		msg.setType(1);
+		msg.setPayload(null);
+		msg.send();
+	}
+
+	void sendInterested () {
+		Message msg = new Message();
+		msg.setType(2);
+		msg.setPayload(null);
+		msg.send();
+	}
+
+	void sendNotInterested () {
+		Message msg = new Message();
+		msg.setType(3);
+		msg.setPayload(null);
+		msg.send();
+	}
+
+	void sendHave (int pieceIndex) {
+		Message msg = new Message();
+		msg.setType(4);
+		msg.setPayload((byte)pieceIndex);
+		msg.send();
+	}
+
+	void sendBitfield () {
+		// has payload: complicated
+		Message msg = new Message();
+		msg.setType(5);
+		msg.setPayload(null);
+		msg.send();
+	}
+
+	void sendRequest (int pieceIndex) {
+		Message msg = new Message();
+		msg.setType(6);
+		msg.setPayload((byte)pieceIndex);
+		msg.send();
+	}
+
+	void sendPiece (int pieceIndex) {
+		// ADD PIECE CONTENT
+		Message msg = new Message();
+		msg.setType(7);
+		msg.setPayload((byte)pieceIndex); // AND PIECE CONTENT!
+		msg.send();
 	}
 
 	//main method
