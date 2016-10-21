@@ -44,28 +44,28 @@ public class Message {
         out.flush();
     }
 
-    void setLength (int length) {
+    public void setLength (int length) {
         this.length = length;
     }
 
-    int getLength () {
+    public int getLength () {
         return length;
     }
-    void setType (int type) {
+    public void setType (int type) {
         if (type < 8 && type > 0) {
             this.type = type;
         }
     }
 
-    int getType () {
+    public int getType () {
         return type;
     }
 
-    void setPayload (bit[] payload) {
+    public void setPayload (bit[] payload) {
         this.payload = payload;
     }
 
-    bit[] getPayload () {
+    public bit[] getPayload () {
         return payload;
     }
 }
