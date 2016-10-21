@@ -21,7 +21,6 @@ public class Client {
 
 	Socket requestSocket;          	//socket connect to the server
 	ObjectOutputStream out;        	//stream write to the socket
-	OutputStream outStream;
  	ObjectInputStream in;          	//stream read from the socket
 	String message;                	//message send to the server
 	byte[] MESSAGE;                	//capitalized message read from the server
@@ -80,6 +79,7 @@ public class Client {
 			try{
 				in.close();
 				out.close();
+				out.close();
 				requestSocket.close();
 			}
 			catch(IOException ioException){
@@ -105,11 +105,12 @@ public class Client {
 		try{
 			//stream write the message
 			String header = "P2PFILESHARINGJPROJ";
-			outStream.write(header.getBytes());
-			outStream.write((byte)0);
-			outStream.write(peerid.getBytes());
+			System.out.println(header.getBytes() + "\n");
+			out.write(header.getBytes());
+			out.write((byte)0);
+			out.write(peerid.getBytes());
 		
-			outStream.flush();
+			out.flush();
 		}
 		catch(IOException ioException){
 			ioException.printStackTrace();
@@ -179,7 +180,12 @@ public class Client {
 		msg.setLength(4);
 		msg.setType(CHOKE);
 		msg.setPayload(null);
-		msg.send(requestSocket);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}
 	}
 
 	void sendUnchoke () {
@@ -187,7 +193,12 @@ public class Client {
 		msg.setLength(4);
 		msg.setType(UNCHOKE);
 		msg.setPayload(null);
-		msg.send(requestSocket);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
 	}
 
 	void sendInterested () {
@@ -195,30 +206,45 @@ public class Client {
 		msg.setLength(4);
 		msg.setType(INTERESTED);
 		msg.setPayload(null);
-		msg.send(requestSocket);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
 	}
 
 	void sendNotInterested () {
 		Message msg = new Message();
 		msg.setLength(4);
-		msg.setType(NOT_INTERESTED));
+		msg.setType(NOT_INTERESTED);
 		msg.setPayload(null);
-		msg.send(requestSocket);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
 	}
 
 	void sendHave (int pieceIndex) {
 		byte[] bPieceIndex = new byte [4];
 		// Convert pieceIndex from int to byte[]
 		for (int i=bPieceIndex.length-1; i>=0; i--) {
-			bPieceIndex[i] = pieceIndex % 12;
+			bPieceIndex[i] = (byte)(pieceIndex % 12);
 			pieceIndex /= 12;
 		}
 
 		Message msg = new Message();
 		msg.setLength(8);
 		msg.setType(HAVE);
-		msg.setPayload((byte[])pieceIndex);
-		msg.send(requestSocket);
+		msg.setPayload(bPieceIndex);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
 	}
 
 	void sendBitfield () {
@@ -227,14 +253,19 @@ public class Client {
 		msg.setLength(0);			// MAKE LENGTH MAKE SENSE
 		msg.setType(BITFIELD);
 		msg.setPayload(null);		// ADD BITFIELD CONTENT
-		msg.send(requestSocket);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
 	}
 
 	void sendRequest (int pieceIndex) {
 		byte[] bPieceIndex = new byte [4];
 		// Convert pieceIndex from int to byte[]
 		for (int i=bPieceIndex.length-1; i>=0; i--) {
-			bPieceIndex[i] = pieceIndex % 12;
+			bPieceIndex[i] = (byte)(pieceIndex % 12);
 			pieceIndex /= 12;
 		}
 
@@ -242,7 +273,12 @@ public class Client {
 		msg.setLength(8);
 		msg.setType(REQUEST);
 		msg.setPayload(bPieceIndex);
-		msg.send(requestSocket);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
 	}
 
 	void sendPiece (int pieceIndex) {
@@ -250,15 +286,20 @@ public class Client {
 		byte[] bPieceIndex = new byte [4];
 		// Convert pieceIndex from int to byte[]
 		for (int i=bPieceIndex.length-1; i>=0; i--) {
-			bPieceIndex[i] = pieceIndex % 12;
+			bPieceIndex[i] = (byte)(pieceIndex % 12);
 			pieceIndex /= 12;
 		}
 
 		Message msg = new Message();
 		msg.setLength(4);				// SET LENGTH APPROPRIATELY 
 		msg.setType(PIECE);
-		msg.setPayload((bPieceIndex); 	// AND PIECE CONTENT!
-		msg.send(requestSocket);
+		msg.setPayload(bPieceIndex); 	// AND PIECE CONTENT!
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
 	}
 
 	//main method
