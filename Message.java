@@ -15,6 +15,12 @@ public class Message {
     private int peerID;         // peerID
     private byte[] payload;     // payload of message
 
+    public Message () {
+        length = 0;
+        type = 0;
+        payload = null;
+    }
+
     public Message (int type, byte[] payload) {
         length = 0;
         this.type = type;
@@ -36,6 +42,10 @@ public class Message {
             out.write(payload);
         }
         out.flush();
+    }
+
+    void setLength (int length) {
+        this.length = length;
     }
 
     int getLength () {
