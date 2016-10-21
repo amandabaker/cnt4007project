@@ -22,11 +22,17 @@ public class PeerProcess extends Thread {
 	private int peerID;						//id for this peer
 	private Socket requestSocket;           //socket to connect to the server
 	public ServerSocket listener;			//will fix privacy later
+	ObjectOutputStream out;         //stream write to the socket
+ 	ObjectInputStream in;          //stream read from the socket
+	private byte [] MESSAGE;
+	private String message;
+
 
 	public PeerProcess(int peerID) {
 		
 		this.peerID = peerID;
 	}
+    
 
 	public void Run() {
 		
@@ -79,18 +85,6 @@ public class PeerProcess extends Thread {
 			//ostrich algorithm approach to exceptions at its finest
 			System.out.println("woops");
 		
-		}
-		catch (ConnectException e) {
-    			System.err.println("Connection refused. You need to initiate a server first.");
-		} 
-		catch ( ClassNotFoundException e ) {
-            		System.err.println("Class not found");
-        	} 
-		catch(UnknownHostException unknownHost){
-			System.err.println("You are trying to connect to an unknown host!");
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
 		}
 		finally{
 			//Close connections
