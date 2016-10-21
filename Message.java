@@ -49,7 +49,7 @@ public class Message {
     }
 
     int getLength () {
-        return payload.length + 4;
+        return length;
     }
     void setType (int type) {
         if (type < 8 && type > 0) {
