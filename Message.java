@@ -61,11 +61,11 @@ public class Message {
         return type;
     }
 
-    public void setPayload (bit[] payload) {
+    public void setPayload (byte[] payload) {
         this.payload = payload;
     }
 
-    public bit[] getPayload () {
+    public byte[] getPayload () {
         return payload;
     }
 }
