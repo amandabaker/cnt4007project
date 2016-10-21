@@ -136,11 +136,12 @@ public class Client {
 		
 	}
 
-	void messageType(byte [] message) 
+	void messageType(Message msg) 
 	{
 		//check message type bit
-		//not tested
-		int type = message[4];
+		/
+		int type = msg.getType();
+		
 		if (type == 0) 
 		{
 			//choke
