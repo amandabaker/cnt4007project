@@ -21,18 +21,20 @@ public class PeerProcess implements Runnable {
 	final int PIECE 			= 7;
 
 	/* common properties from Common.cfg */
-	private int fileSize;
 	private int numberOfPerferredNeighbors;
+	private int unchokingInterval;
 	private int optimisticUnchokingInterval;
-	private int pieceSize;
 	private String fileName;
+	private int fileSize;
+	private int pieceSize;
 
 	/* unique peer properites */
 	//todo: peers
 	private int port;
 	private String host;
 	private boolean gotFile;
-	//private Bitfield bitfield
+	private BitSet bitfield;
+	private Byte [][] data;
 
 	private int peerID;						//id for this peer
 	private byte [] MESSAGE;
@@ -330,6 +332,8 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+	/* ---------- Send messages ---------- */
+
 	/* Send choke message */
 	void sendChoke () {
 		Message msg = new Message();
@@ -465,6 +469,8 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
+	/* ---------- End send messages ---------- */
+
 	/* Get message length */
 	int messageLength(byte[] ml) {
 		byte[] meslen = new byte[4];
@@ -476,10 +482,69 @@ public class PeerProcess implements Runnable {
 		
 	}
 
+	/* TODO: read common.cfg */
+	void configureGeneral () {
+		// add a try statement
+
+		FileReader fileReader = new FileReader("Common.cfg");
+		BufferedReader bufferedReader = new BufferedReader(fileReader);u
+		StringTokenizer tokens;
+
+		line = bufferedReader.readLine();
+		tokens = line ? new StringTokenizer(line) : null;
+		numberOfPerferredNeighbors = tokens ? tokens[1] : null;
+
+		unchokingInterval;
+		optimisticUnchokingInterval;
+		fileName;
+		fileSize;
+		pieceSize;
+		
+		while ((line = bufferedReader.readLine()) != null) {
+			
+		}
+	}
+
 	/* TODO: Read Config File */
+	void configurePeer() {
+		FileReader fileReader = new FileReader("PeerInfo.cfg");
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+		String line = null;
+		String peerID = "";
+		String hostname = "";
+		String port = "";
+		String hasFile = "";
+		//int sPort = 8000;
+		int i = 0;
+		
+		while ((line = bufferedReader.readLine()) != null) {
+			System.out.println(line + "\n");
+			listenerArr[i] = new ServerSocket(sPort++
+			);
+			StringTokenizer tokens = new StringTokenizer(line);
+			if (tokens.countTokens() < 4) {
+				// throw too few tokens
+			} else if (tokens.countTokens() > 4) {
+				// throw too many tokens
+			}
+			peerID = tokens.nextToken();
+			hostname = tokens.nextToken();
+			port = tokens.nextToken();
+			hasFile = tokens.nextToken();
+			System.out.println("almost new\n");
+			while (true) {
+				new Handler (listenerArr[i++].accept(),peerID, hostname).start();
+				System.out.println("end\n");
+			}
+		}
+	}
 
 	/* TODO: Create files and folders if they don't exist */
 	
+	/* TODO: Write logs */
+
+	/*  */
 
 	/* Main Method */
 	public static void main(String args[]) {
