@@ -8,7 +8,7 @@ import java.util.*;
 import java.lang.*;
 import java.math.BigInteger;
 
-public class PeerProcess extends Thread {
+public class PeerProcess implements Runnable {
 
 	final int CHOKE 			= 0; 
 	final int UNCHOKE 			= 1;
@@ -18,6 +18,26 @@ public class PeerProcess extends Thread {
 	final int BITFIELD 			= 5;
 	final int REQUEST 			= 6;
 	final int PIECE 			= 7;
+
+
+	//common properties from Common.cfg
+	private int numberOfPerferredNeighbors;
+	private int unchokingInterval;
+	private int optimisticUnchokingInterval;
+	private String fileName;
+	private int fileSize;
+	private int pieceSize;
+
+	//unique peer properites
+	
+	//todo: peers
+	private int port;
+	private String host;
+	private boolean gotFile;
+	//private Bitfield bitfield
+
+
+
 
 	private int peerID;						//id for this peer
 	private Socket requestSocket;           //socket to connect to the server
@@ -33,20 +53,22 @@ public class PeerProcess extends Thread {
 		this.peerID = peerID;
 	}
     
-
-	public void Run() {
-		
+	
+	public void run() {	
+		System.out.println("test1");
 		try {
 			//initialize me captain
 			startupPeer(peerID);
+			System.out.println("test2");
 			//create a socket to connect to the server
 			requestSocket = new Socket("localhost", 8000);//("66.231.144.240", 8080);//
+			System.out.println("test3");
 			System.out.println("Connected to localhost in port 8000");
 			//initialize inputStream and outputStream
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
 			out.flush();
 			in = new ObjectInputStream(requestSocket.getInputStream());
-			
+			System.out.println("test4");
 			//get Input from standard input
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 			//first, send a handshake with the peer ID
@@ -99,13 +121,13 @@ public class PeerProcess extends Thread {
 		}
 	}
 
-	private void startupPeer(int peerID) {
+	public void startupPeer(int peerID) {
 		
 		// Hardcoding first peer to start for now
 		if (peerID == 1001) {
 		
 			//spin up a server socket, port hardcoded for now
-			spinServer(8080);
+			spinServer(8000);
 
 		} else {
 			
@@ -117,7 +139,7 @@ public class PeerProcess extends Thread {
 		}
 	}
 
-	private void spinServer(int port) {
+	void spinServer(int port) {
 
 
 		int serverPort = port;
@@ -155,7 +177,7 @@ public class PeerProcess extends Thread {
 	
 	}
 
-	private void openConnection() { // TODO: String dest, int port) {
+	void openConnection() { // TODO: String dest, int port) {
 
 		//create a socket to connect to the server
 
@@ -167,7 +189,8 @@ public class PeerProcess extends Thread {
 
 		//requestSocket = new Socket("localhost", 8000);
 		try {
-			requestSocket = new Socket("66.231.144.240", 8080);
+			//requestSocket = new Socket("66.231.144.240", 8080);
+			requestSocket = new Socket("localhost", 8000);
 		} 
 		catch(Exception e) {
 			System.out.println("exception handling coming in v0.2!!!");
@@ -453,11 +476,18 @@ public class PeerProcess extends Thread {
 	//main method
 	public static void main(String args[])
 	{
-		Client client = new Client();
-		client.run();
+		
+		PeerProcess peer = new PeerProcess(Integer.parseInt(args[0]));
+		//spin a thread and start the peer
+		Thread peer_thread = new Thread(peer);
+		peer_thread.start();
+
+		//I left this in case anyone was still using client, but it works all inside PeerProcess now
+		//Client client = new Client();
+		//client.run();
 	}
 
-	// Reading from files
+	// Reading from files (need to create the file structure too, peer_[id])
 	/*
 	// ----- TODO: Read Common.cfg
 

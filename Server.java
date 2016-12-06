@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Server {
 
-	private static final int sPort = 80;   //The server will be listening on this port number
+	private static final int sPort = 8000;   //The server will be listening on this port number
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("The server is running."); 
@@ -31,13 +31,13 @@ public class Server {
      	*/
     	private static class Handler extends Thread {
         	//private String message;    //message received from the client
-    		private byte [] message;
-		//private String MESSAGE;    //uppercase message send to the client
-    	private byte [] MESSAGE;
-		private Socket connection;
-        	private ObjectInputStream in;	//stream read from the socket
-        	private ObjectOutputStream out;    //stream write to the socket
-		private int no;		//The index number of the client
+			private byte [] message;
+			//private String MESSAGE;    //uppercase message send to the client
+	    	private byte [] MESSAGE;
+			private Socket connection;
+	    	private ObjectInputStream in;	//stream read from the socket
+	    	private ObjectOutputStream out;    //stream write to the socket
+			private int no;		//The index number of the client
 
         	public Handler(Socket connection, int no) {
             		this.connection = connection;
