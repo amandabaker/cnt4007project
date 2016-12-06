@@ -476,6 +476,11 @@ public class PeerProcess implements Runnable {
 		
 	}
 
+	/* TODO: Read Config File */
+
+	/* TODO: Create files and folders if they don't exist */
+	
+
 	/* Main Method */
 	public static void main(String args[]) {
 		
