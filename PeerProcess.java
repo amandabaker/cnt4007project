@@ -99,7 +99,7 @@ public class PeerProcess implements Runnable {
 		} catch(Exception e) {
 			
 			//ostrich algorithm approach to exceptions at its finest
-			System.out.println("woops");
+			System.out.println("whoops");
 		
 		}
 		finally{
