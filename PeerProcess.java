@@ -10,6 +10,7 @@ import java.math.BigInteger;
 
 public class PeerProcess implements Runnable {
 
+	/* Message types */
 	final int CHOKE 			= 0; 
 	final int UNCHOKE 			= 1;
 	final int INTERESTED 		= 2;
@@ -19,41 +20,34 @@ public class PeerProcess implements Runnable {
 	final int REQUEST 			= 6;
 	final int PIECE 			= 7;
 
-
-	//common properties from Common.cfg
-	private int numberOfPerferredNeighbors;
-	private int unchokingInterval;
-	private int optimisticUnchokingInterval;
-	private String fileName;
+	/* common properties from Common.cfg */
 	private int fileSize;
+	private int numberOfPerferredNeighbors;
+	private int optimisticUnchokingInterval;
 	private int pieceSize;
+	private String fileName;
 
-	//unique peer properites
-	
+	/* unique peer properites */
 	//todo: peers
 	private int port;
 	private String host;
 	private boolean gotFile;
 	//private Bitfield bitfield
 
-
-
-
 	private int peerID;						//id for this peer
-	private Socket requestSocket;           //socket to connect to the server
-	public ServerSocket listener;			//will fix privacy later
-	ObjectOutputStream out;         //stream write to the socket
- 	ObjectInputStream in;          //stream read from the socket
 	private byte [] MESSAGE;
 	private String message;
+	private Socket requestSocket;           //socket to connect to the server
+	public ServerSocket listener;			//will fix privacy later
+	ObjectOutputStream out;         		//stream write to the socket
+	ObjectInputStream in;          			//stream read from the socket
 
-
+	/* Constructor */
 	public PeerProcess(int peerID) {
-		
 		this.peerID = peerID;
 	}
     
-	
+	/* Method run by each thread */
 	public void run() {	
 		System.out.println("test1");
 		try {
@@ -121,6 +115,7 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+	/* Startup as server or client */
 	public void startupPeer(int peerID) {
 		
 		// Hardcoding first peer to start for now
@@ -139,8 +134,8 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+	/* Spin up server */
 	void spinServer(int port) {
-
 
 		int serverPort = port;
 
@@ -177,6 +172,7 @@ public class PeerProcess implements Runnable {
 	
 	}
 
+	/* Spin up client? */
 	void openConnection() { // TODO: String dest, int port) {
 
 		//create a socket to connect to the server
@@ -197,8 +193,8 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
-	void sendMessage(byte[] msg)
-	{
+	/* Send message to OutputStream */
+	void sendMessage(byte[] msg) {
 		try{
 			//stream write the message
 			out.writeObject(msg);
@@ -208,9 +204,8 @@ public class PeerProcess implements Runnable {
 			ioException.printStackTrace();
 		}
 	}
-	//handshake method
-	void handshake(int peerid)
-	{
+	/* Perform handshake */
+	void handshake(int peerid) {
 		//convert integer peerID (can change to byte[] if more convenient) to string
 		String pid = Integer.toString(peerid);
 		//add peer id to end of handshake message
@@ -242,8 +237,9 @@ public class PeerProcess implements Runnable {
 			ioException.printStackTrace();
 		}
 	}
-	boolean handshakeCheck(byte[] hcheck) 
-	{
+
+	/* Validate handshake */
+	boolean handshakeCheck(byte[] hcheck) {
 		//check whether handshake was successful and connected peer is valid
 		//proper header string
 		String head = "P2PFILESHARINGPROJ0000000000";
@@ -294,9 +290,8 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-	// Check the type of the recieved message and act accordingly
-	void messageType(Message msg) 
-	{
+	/* Check the type of the recieved message and act accordingly */
+	void messageType(Message msg) {
 		//check message type bit
 		int type = msg.getType();
 
@@ -335,6 +330,7 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+	/* Send choke message */
 	void sendChoke () {
 		Message msg = new Message();
 		msg.setLength(4);
@@ -348,6 +344,7 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+	/* Send unchoke message */
 	void sendUnchoke () {
 		Message msg = new Message();
 		msg.setLength(4);
@@ -361,6 +358,7 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
+	/* Send interested message */
 	void sendInterested () {
 		Message msg = new Message();
 		msg.setLength(4);
@@ -374,6 +372,7 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
+	/* Send not interested message */
 	void sendNotInterested () {
 		Message msg = new Message();
 		msg.setLength(4);
@@ -387,6 +386,7 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
+	/* Send have message */
 	void sendHave (int pieceIndex) {
 		byte[] bPieceIndex = new byte [4];
 		// Convert pieceIndex from int to byte[]
@@ -407,6 +407,7 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
+	/* Send bitfield message */
 	void sendBitfield () {
 		// has payload: complicated
 		Message msg = new Message();
@@ -421,6 +422,7 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
+	/* Send request message */
 	void sendRequest (int pieceIndex) {
 		byte[] bPieceIndex = new byte [4];
 		// Convert pieceIndex from int to byte[]
@@ -441,6 +443,7 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
+	/* Send piece message */
 	void sendPiece (int pieceIndex) {
 		// ADD PIECE CONTENT
 		byte[] bPieceIndex = new byte [4];
@@ -461,11 +464,11 @@ public class PeerProcess implements Runnable {
 			ioException.printStackTrace();
 		}	
 	}
-	int messageLength(byte[] ml) 
-	{
+
+	/* Get message length */
+	int messageLength(byte[] ml) {
 		byte[] meslen = new byte[4];
-		for (int i = 0; i<5; i++) 
-		{
+		for (int i = 0; i<5; i++) {
 			meslen[i] = ml[i]; 
 		}
 		//returns integer value of first four bits of byte message
@@ -473,9 +476,8 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-	//main method
-	public static void main(String args[])
-	{
+	/* Main Method */
+	public static void main(String args[]) {
 		
 		PeerProcess peer = new PeerProcess(Integer.parseInt(args[0]));
 		//spin a thread and start the peer
