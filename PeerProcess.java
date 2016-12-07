@@ -119,64 +119,6 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
-	/* TODO: read common.cfg */
-	void configureGeneral () {
-		// add a try statement
-
-		FileReader fileReader = new FileReader("Common.cfg");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);u
-		StringTokenizer tokens;
-
-		line = bufferedReader.readLine();
-		tokens = line ? new StringTokenizer(line) : null;
-		numberOfPerferredNeighbors = tokens ? tokens[1] : null;
-
-		unchokingInterval;
-		optimisticUnchokingInterval;
-		fileName;
-		fileSize;
-		pieceSize;
-		
-		while ((line = bufferedReader.readLine()) != null) {
-			
-		}
-	}
-
-	/* TODO: Read Config File */
-	void configurePeer() {
-		FileReader fileReader = new FileReader("PeerInfo.cfg");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-		String line = null;
-		String peerID = "";
-		String hostname = "";
-		String port = "";
-		String hasFile = "";
-		//int sPort = 8000;
-		int i = 0;
-		
-		while ((line = bufferedReader.readLine()) != null) {
-			System.out.println(line + "\n");
-			listenerArr[i] = new ServerSocket(sPort++
-			);
-			StringTokenizer tokens = new StringTokenizer(line);
-			if (tokens.countTokens() < 4) {
-				// throw too few tokens
-			} else if (tokens.countTokens() > 4) {
-				// throw too many tokens
-			}
-			peerID = tokens.nextToken();
-			hostname = tokens.nextToken();
-			port = tokens.nextToken();
-			hasFile = tokens.nextToken();
-			System.out.println("almost new\n");
-			while (true) {
-				new Handler (listenerArr[i++].accept(),peerID, hostname).start();
-				System.out.println("end\n");
-			}
-		}
-	}
-
 	/* Startup as server or client */
 	public void startupPeer(int peerID) {
 		
@@ -196,6 +138,97 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+		/* Read Common.cfg */
+	void configureGeneral () {
+		try {
+			FileReader fileReader = new FileReader("Common.cfg");
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			StringTokenizer tokens;
+			String line;
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			numberOfPerferredNeighbors = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			unchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()): null;
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			optimisticUnchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			fileName = tokens != null ? tokens.nextToken() : null;	
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			fileSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			pieceSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	/* Read PeerProcess.cfg */
+	void configurePeer () {
+		// initialize variables
+		nPieces 	= (int)Math.ceil(fileSize/pieceSize);
+		bitfield 	= new BitSet(nPieces);
+		data 		= new byte[nPieces][pieceSize];
+			
+		String line 	= null;
+		String hostname = "";
+		String port 	= "";
+		String hasFile 	= "";
+		String peerIDstr= "";
+
+		try {
+			FileReader fileReader = new FileReader("PeerInfo.cfg");
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+			//int sPort = 8000;
+			int i = 0;
+			
+			peerIDstr = Integer.toString(peerID);
+
+			while ((line = bufferedReader.readLine()) != null) {
+				StringTokenizer tokens = new StringTokenizer(line);
+				if (tokens.countTokens() < 4) {
+					// throw too few tokens
+				} else if (tokens.countTokens() > 4) {
+					// throw too many tokens
+				} else if (tokens.nextToken() == peerIDstr) {
+					hostname = tokens.nextToken();
+					port = tokens.nextToken();
+					hasFile = tokens.nextToken();
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		// if this process has the file
+		if (hasFile == "1") {
+			// set bitfield to all ones
+			bitfield.set(0,nPieces-1);
+
+			// store data
+			String file = "./peer_" + peerIDstr + "/" + fileName;
+			try {
+				FileInputStream fileInput = new FileInputStream(file);
+				for (int i=0; i<nPieces; i++) {
+					fileInput.read(data[i]);
+				}
+			} catch (Exception e) {	 // if file doesn't exist
+				System.out.println(e);
+			}
+		}
+	}
+	
 	/* Spin up server */
 	void spinServer(int port) {
 
@@ -266,6 +299,7 @@ public class PeerProcess implements Runnable {
 			ioException.printStackTrace();
 		}
 	}
+
 	/* Perform handshake */
 	void handshake(int peerid) {
 		//convert integer peerID (can change to byte[] if more convenient) to string
@@ -583,97 +617,6 @@ public class PeerProcess implements Runnable {
 		//returns integer value of first four bits of byte message
 		return new BigInteger(meslen).intValue();
 		
-	}
-
-	/* TODO: read common.cfg */
-	void configureGeneral () {
-		try {
-			FileReader fileReader = new FileReader("Common.cfg");
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			StringTokenizer tokens;
-			String line;
-
-			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			numberOfPerferredNeighbors = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
-
-			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			unchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()): null;
-
-			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			optimisticUnchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
-
-			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			fileName = tokens != null ? tokens.nextToken() : null;	
-
-			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			fileSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
-
-			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			pieceSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
-	/* TODO: Read Config File */
-	void configurePeer () {
-		// initialize variables
-		nPieces 	= (int)Math.ceil(fileSize/pieceSize);
-		bitfield 	= new BitSet(nPieces);
-		data 		= new byte[nPieces][pieceSize];
-			
-		String line 	= null;
-		String hostname = "";
-		String port 	= "";
-		String hasFile 	= "";
-		String peerIDstr= "";
-
-		try {
-			FileReader fileReader = new FileReader("PeerInfo.cfg");
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-			//int sPort = 8000;
-			int i = 0;
-			
-			peerIDstr = Integer.toString(peerID);
-
-			while ((line = bufferedReader.readLine()) != null) {
-				StringTokenizer tokens = new StringTokenizer(line);
-				if (tokens.countTokens() < 4) {
-					// throw too few tokens
-				} else if (tokens.countTokens() > 4) {
-					// throw too many tokens
-				} else if (tokens.nextToken() == peerIDstr) {
-					hostname = tokens.nextToken();
-					port = tokens.nextToken();
-					hasFile = tokens.nextToken();
-				}
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		// if this process has the file
-		if (hasFile == "1") {
-			// set bitfield to all ones
-			bitfield.set(0,nPieces-1);
-
-			// store data
-			String file = "./peer_" + peerIDstr + "/" + fileName;
-			try {
-				FileInputStream fileInput = new FileInputStream(file);
-				for (int i=0; i<nPieces; i++) {
-					fileInput.read(data[i]);
-				}
-			} catch (Exception e) {	 // if file doesn't exist
-				System.out.println(e);
-			}
-		}
 	}
 
 	/* TODO: Create files and folders if they don't exist */
