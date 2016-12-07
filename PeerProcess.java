@@ -138,7 +138,7 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
-		/* Read Common.cfg */
+	/* Read Common.cfg */
 	void configureGeneral () {
 		try {
 			FileReader fileReader = new FileReader("Common.cfg");
@@ -180,22 +180,23 @@ public class PeerProcess implements Runnable {
 		nPieces 	= (int)Math.ceil(fileSize/pieceSize);
 		bitfield 	= new BitSet(nPieces);
 		data 		= new byte[nPieces][pieceSize];
-			
-		String line 	= null;
-		String hostname = "";
-		String port 	= "";
-		String hasFile 	= "";
-		String peerIDstr= "";
+
+		FileReader fileReader = new FileReader("PeerInfo.cfg");
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+		int nPeers = getNumPeers(bufferedReader);
+		
+		String line;
+		String hostnames;
+		String ports;
+		BitSet bitfields;
+		String hasFile;
+		String peerIDstr;
 
 		try {
-			FileReader fileReader = new FileReader("PeerInfo.cfg");
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-			//int sPort = 8000;
 			int i = 0;
 			
 			peerIDstr = Integer.toString(peerID);
-
 			while ((line = bufferedReader.readLine()) != null) {
 				StringTokenizer tokens = new StringTokenizer(line);
 				if (tokens.countTokens() < 4) {
@@ -227,6 +228,13 @@ public class PeerProcess implements Runnable {
 				System.out.println(e);
 			}
 		}
+	}
+
+	/* Count number of peers in PeerInfo.cfg */
+	int getNumPeers (BufferedReader bufferedReader) {
+		int i = 0;
+		while (bufferedReader.readLine() != null) i++;
+		return i;
 	}
 
 	/* Spin up server */
@@ -432,6 +440,7 @@ public class PeerProcess implements Runnable {
 			//reevaluate interest/non-interest
 		}
 	}
+
 /******* Message Handlers *******
 
 	boolean receivedBitfield(BitSet senderField, sender) {
