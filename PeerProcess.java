@@ -28,13 +28,15 @@ public class PeerProcess implements Runnable {
 	private int fileSize;
 	private int pieceSize;
 
+	private int nPieces;
+
 	/* unique peer properites */
 	//todo: peers
 	private int port;
 	private String host;
 	private boolean gotFile;
 	private BitSet bitfield;
-	private Byte [][] data;
+	private byte [][] data;
 
 	private int peerID;						//id for this peer
 	private byte [] MESSAGE;
@@ -98,7 +100,7 @@ public class PeerProcess implements Runnable {
 				System.out.println("Receive message: " + bytestring);
 			}
 
-		} catch(Exception e) {
+		} catch (Exception e) {
 			
 			//ostrich algorithm approach to exceptions at its finest
 			System.out.println("whoops");
@@ -334,140 +336,140 @@ public class PeerProcess implements Runnable {
 
 	/* ---------- Send messages ---------- */
 
-	/* Send choke message */
-	void sendChoke () {
-		Message msg = new Message();
-		msg.setLength(4);
-		msg.setType(CHOKE);
-		msg.setPayload(null);
-		try {
-			msg.send(requestSocket);
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}
-	}
-
-	/* Send unchoke message */
-	void sendUnchoke () {
-		Message msg = new Message();
-		msg.setLength(4);
-		msg.setType(UNCHOKE);
-		msg.setPayload(null);
-		try {
-			msg.send(requestSocket);
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}	
-	}
-
-	/* Send interested message */
-	void sendInterested () {
-		Message msg = new Message();
-		msg.setLength(4);
-		msg.setType(INTERESTED);
-		msg.setPayload(null);
-		try {
-			msg.send(requestSocket);
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}	
-	}
-
-	/* Send not interested message */
-	void sendNotInterested () {
-		Message msg = new Message();
-		msg.setLength(4);
-		msg.setType(NOT_INTERESTED);
-		msg.setPayload(null);
-		try {
-			msg.send(requestSocket);
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}	
-	}
-
-	/* Send have message */
-	void sendHave (int pieceIndex) {
-		byte[] bPieceIndex = new byte [4];
-		// Convert pieceIndex from int to byte[]
-		for (int i=bPieceIndex.length-1; i>=0; i--) {
-			bPieceIndex[i] = (byte)(pieceIndex % 12);
-			pieceIndex /= 12;
+		/* Send choke message */
+		void sendChoke () {
+			Message msg = new Message();
+			msg.setLength(4);
+			msg.setType(CHOKE);
+			msg.setPayload(null);
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}
 		}
 
-		Message msg = new Message();
-		msg.setLength(8);
-		msg.setType(HAVE);
-		msg.setPayload(bPieceIndex);
-		try {
-			msg.send(requestSocket);
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}	
-	}
-
-	/* Send bitfield message */
-	void sendBitfield () {
-		// has payload: complicated
-		Message msg = new Message();
-		msg.setLength(0);			// MAKE LENGTH MAKE SENSE
-		msg.setType(BITFIELD);
-		msg.setPayload(null);		// ADD BITFIELD CONTENT
-		try {
-			msg.send(requestSocket);
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}	
-	}
-
-	/* Send request message */
-	void sendRequest (int pieceIndex) {
-		byte[] bPieceIndex = new byte [4];
-		// Convert pieceIndex from int to byte[]
-		for (int i=bPieceIndex.length-1; i>=0; i--) {
-			bPieceIndex[i] = (byte)(pieceIndex % 12);
-			pieceIndex /= 12;
+		/* Send unchoke message */
+		void sendUnchoke () {
+			Message msg = new Message();
+			msg.setLength(4);
+			msg.setType(UNCHOKE);
+			msg.setPayload(null);
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}	
 		}
 
-		Message msg = new Message();
-		msg.setLength(8);
-		msg.setType(REQUEST);
-		msg.setPayload(bPieceIndex);
-		try {
-			msg.send(requestSocket);
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}	
-	}
-
-	/* Send piece message */
-	void sendPiece (int pieceIndex) {
-		// ADD PIECE CONTENT
-		byte[] bPieceIndex = new byte [4];
-		// Convert pieceIndex from int to byte[]
-		for (int i=bPieceIndex.length-1; i>=0; i--) {
-			bPieceIndex[i] = (byte)(pieceIndex % 12);
-			pieceIndex /= 12;
+		/* Send interested message */
+		void sendInterested () {
+			Message msg = new Message();
+			msg.setLength(4);
+			msg.setType(INTERESTED);
+			msg.setPayload(null);
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}	
 		}
 
-		Message msg = new Message();
-		msg.setLength(4);				// SET LENGTH APPROPRIATELY 
-		msg.setType(PIECE);
-		msg.setPayload(bPieceIndex); 	// AND PIECE CONTENT!
-		try {
-			msg.send(requestSocket);
+		/* Send not interested message */
+		void sendNotInterested () {
+			Message msg = new Message();
+			msg.setLength(4);
+			msg.setType(NOT_INTERESTED);
+			msg.setPayload(null);
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}	
 		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}	
-	}
+
+		/* Send have message */
+		void sendHave (int pieceIndex) {
+			byte[] bPieceIndex = new byte [4];
+			// Convert pieceIndex from int to byte[]
+			for (int i=bPieceIndex.length-1; i>=0; i--) {
+				bPieceIndex[i] = (byte)(pieceIndex % 12);
+				pieceIndex /= 12;
+			}
+
+			Message msg = new Message();
+			msg.setLength(8);
+			msg.setType(HAVE);
+			msg.setPayload(bPieceIndex);
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}	
+		}
+
+		/* Send bitfield message */
+		void sendBitfield () {
+			// has payload: complicated
+			Message msg = new Message();
+			msg.setLength(0);			// MAKE LENGTH MAKE SENSE
+			msg.setType(BITFIELD);
+			msg.setPayload(null);		// ADD BITFIELD CONTENT
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}	
+		}
+
+		/* Send request message */
+		void sendRequest (int pieceIndex) {
+			byte[] bPieceIndex = new byte [4];
+			// Convert pieceIndex from int to byte[]
+			for (int i=bPieceIndex.length-1; i>=0; i--) {
+				bPieceIndex[i] = (byte)(pieceIndex % 12);
+				pieceIndex /= 12;
+			}
+
+			Message msg = new Message();
+			msg.setLength(8);
+			msg.setType(REQUEST);
+			msg.setPayload(bPieceIndex);
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}	
+		}
+
+		/* Send piece message */
+		void sendPiece (int pieceIndex) {
+			// ADD PIECE CONTENT
+			byte[] bPieceIndex = new byte [4];
+			// Convert pieceIndex from int to byte[]
+			for (int i=bPieceIndex.length-1; i>=0; i--) {
+				bPieceIndex[i] = (byte)(pieceIndex % 12);
+				pieceIndex /= 12;
+			}
+
+			Message msg = new Message();
+			msg.setLength(4);				// SET LENGTH APPROPRIATELY 
+			msg.setType(PIECE);
+			msg.setPayload(bPieceIndex); 	// AND PIECE CONTENT!
+			try {
+				msg.send(requestSocket);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}	
+		}
 
 	/* ---------- End send messages ---------- */
 
@@ -484,58 +486,91 @@ public class PeerProcess implements Runnable {
 
 	/* TODO: read common.cfg */
 	void configureGeneral () {
-		// add a try statement
+		try {
+			FileReader fileReader = new FileReader("Common.cfg");
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			StringTokenizer tokens;
+			String line;
 
-		FileReader fileReader = new FileReader("Common.cfg");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);u
-		StringTokenizer tokens;
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			numberOfPerferredNeighbors = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
 
-		line = bufferedReader.readLine();
-		tokens = line ? new StringTokenizer(line) : null;
-		numberOfPerferredNeighbors = tokens ? tokens[1] : null;
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			unchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()): null;
 
-		unchokingInterval;
-		optimisticUnchokingInterval;
-		fileName;
-		fileSize;
-		pieceSize;
-		
-		while ((line = bufferedReader.readLine()) != null) {
-			
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			optimisticUnchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			fileName = tokens != null ? tokens.nextToken() : null;	
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			fileSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+
+			line = bufferedReader.readLine();
+			tokens = line != null ? new StringTokenizer(line) : null;
+			pieceSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+		} catch (Exception e) {
+			System.out.println(e);
 		}
 	}
 
 	/* TODO: Read Config File */
-	void configurePeer() {
-		FileReader fileReader = new FileReader("PeerInfo.cfg");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-		String line = null;
-		String peerID = "";
+	void configurePeer () {
+		// initialize variables
+		nPieces 	= (int)Math.ceil(fileSize/pieceSize);
+		bitfield 	= new BitSet(nPieces);
+		data 		= new byte[nPieces][pieceSize];
+			
+		String line 	= null;
 		String hostname = "";
-		String port = "";
-		String hasFile = "";
-		//int sPort = 8000;
-		int i = 0;
-		
-		while ((line = bufferedReader.readLine()) != null) {
-			System.out.println(line + "\n");
-			listenerArr[i] = new ServerSocket(sPort++
-			);
-			StringTokenizer tokens = new StringTokenizer(line);
-			if (tokens.countTokens() < 4) {
-				// throw too few tokens
-			} else if (tokens.countTokens() > 4) {
-				// throw too many tokens
+		String port 	= "";
+		String hasFile 	= "";
+		String peerIDstr= "";
+
+		try {
+			FileReader fileReader = new FileReader("PeerInfo.cfg");
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+			//int sPort = 8000;
+			int i = 0;
+			
+			peerIDstr = Integer.toString(peerID);
+
+			while ((line = bufferedReader.readLine()) != null) {
+				StringTokenizer tokens = new StringTokenizer(line);
+				if (tokens.countTokens() < 4) {
+					// throw too few tokens
+				} else if (tokens.countTokens() > 4) {
+					// throw too many tokens
+				} else if (tokens.nextToken() == peerIDstr) {
+					hostname = tokens.nextToken();
+					port = tokens.nextToken();
+					hasFile = tokens.nextToken();
+				}
 			}
-			peerID = tokens.nextToken();
-			hostname = tokens.nextToken();
-			port = tokens.nextToken();
-			hasFile = tokens.nextToken();
-			System.out.println("almost new\n");
-			while (true) {
-				new Handler (listenerArr[i++].accept(),peerID, hostname).start();
-				System.out.println("end\n");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		// if this process has the file
+		if (hasFile == "1") {
+			// set bitfield to all ones
+			bitfield.set(0,nPieces-1);
+
+			// store data
+			String file = "./peer_" + peerIDstr + "/" + fileName;
+			try {
+				FileInputStream fileInput = new FileInputStream(file);
+				for (int i=0; i<nPieces; i++) {
+					fileInput.read(data[i]);
+				}
+			} catch (Exception e) {	 // if file doesn't exist
+				System.out.println(e);
 			}
 		}
 	}
@@ -551,6 +586,7 @@ public class PeerProcess implements Runnable {
 		
 		PeerProcess peer = new PeerProcess(Integer.parseInt(args[0]));
 		//spin a thread and start the peer
+		// TODO: start each peer
 		Thread peer_thread = new Thread(peer);
 		peer_thread.start();
 
