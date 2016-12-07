@@ -386,24 +386,34 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-	/* Check the type of the recieved message and act accordingly */
+/* Check the type of the recieved message and act accordingly */
 	void messageType(Message msg) {
 		//check message type bit
 		int type = msg.getType();
+		int sender = msg.getPeerID();
 
 		if (type == BITFIELD) 
 		{
 			//add bitfield to datastructure that tracks each peer's bitfield
 			//compare to this peer's bitfield to see if there is any interest
 			//send interested/not interested
+		/*	
+			//update sender's bitfield
+			peers[sender].setTheirBitField(senderField); //peers[] is an array of PeerInfo instances, one for each neighbor
+			boolean check = checkInterest(senderField);
+			check ? sendInterested(peers[sender].getSocket()) : sendUninterested(peers[sender].getSocket()); //assuming we send to socket, idk
+		*/
 		}
 		else if (type == INTERESTED) 
 		{
-			//add to list of peers interested in this peer's data
+			//update this peer's info about sender to include that sender is interested in this peer's data
+			//peers[sender].setInterested(true);
+
 		}
 		else if (type == NOT_INTERESTED) 
 		{
-			//if was on list of peers interested in this peer's data, remove it
+			//set sender's interest in this peer to false
+			//peers[sender].setInterested(false);
 		}
 		else if (type == CHOKE) 
 		{
@@ -412,11 +422,21 @@ public class PeerProcess implements Runnable {
 		}
 		else if (type == UNCHOKE)
 		{
-			// send requests
+			// check if still interested, then send requests
+		/*	
+			ArrayList<int> want = findWantedPieces(sender);
+			//if there are no wanted pieces, send an uninterested message
+			//else send a request for a random piece that this peer doesn't have
+			want.isEmpty() ? sendUninterested(peers[sender].getSocket()) : sendRequest(sender, getRandomPiece());
+
+		*/
 		}
 		else if (type == REQUEST) 
 		{
 			//send piece message back with requested piece
+		/*
+			sendPiece(sender, data[msg.getRequestIndex()]);
+		*/
 		}
 		else if (type == PIECE)
 		{
@@ -425,185 +445,192 @@ public class PeerProcess implements Runnable {
 			//check if still interested in current peer, if yes request
 			//else send not interested
 			//finally check to see if file is complete, if yes enter random selected neighbors mode
+		/*	
+			//Add piece to data, broadcast updated bitfield
+			data[msg.getPieceId()] = msg.getPayLoad();
+			for(peer : peers) {
+				sendHave(peer, bitfield);
+			}
+				
+			// check if still interested, then send requests
+			ArrayList<int> want = findWantedPieces(sender);
+			//if there are no wanted pieces, send an uninterested message
+			//else send a request for a random piece that this peer doesn't have
+			want.isEmpty() ? sendUninterested(peers[sender].getSocket()) : sendRequest(sender, getRandomPiece());
+		*/
 		}
 		else if (type == HAVE) 
 		{
 			//update tracked bitfield for sender
 			//reevaluate interest/non-interest
+		/*	
+			//update sender's bitfield
+			peers[sender].setTheirBitField(senderField); //peers[] is an array of PeerInfo instances, one for each neighbor
+			boolean check = checkInterest(senderField);
+			check ? sendInterested(peers[sender].getSocket()) : sendUninterested(peers[sender].getSocket()); //assuming we send to socket, idk
+		*/
 		}
 	}
-/******* Message Handlers *******
+	/******* Message Handlers and Helpers *******
 
-	boolean receivedBitfield(BitSet senderField, sender) {
+	boolean checkInterest(BitSet senderField) {
+		for (piece : senderField) {
+			if (bitfield[piece] == senderField[piece]) {
+				return true;	//there's at least one piece this peer is interested in
+			}
+		}
 
-		bitfield is a BitSet where each index represents a piece the peer either has or does not have
-		update sender's bitfield
+		return false;	//there's nothing the sender has that this peer wants
+	}
 
-		return interested ? true : false;
+	ArrayList<int> findWantedPieces(BitSet senderField) {
+		ArrayList<int> want = new ArrayList<int>();
+		for (piece : senderField) {
+			if ((bitfield[piece] != senderField[piece]) && (senderField[piece] == 1)) {
+				want.add(piece);	//append the index of the piece they have that we want
+			}
+		}
+		return want;
 	}
 	
-	void receivedInterested(int sender) {
-		interestedSet.add(sender);		//or something similar
-	}
+	********************************************/	
 
-	void receivedUninterested(int sender) {
-		interestSet.remove(objectForKey(sender));
-	}
-
-	void receivedUnchoke(int sender) {
-		find pieces interested in
-		sendRequest(randomPiece, sender);
-	}
-
-	void receivedRequest(int sender, int pieceIndex) {
-		sendPiece(sender, piece);
-	}
-
-	void receivedPiece(int sender, byte[] piece, int pieceIndex) {
-		data.add(piece);
-		bitfield[pieceIndex] = true;
-		interested ? sendRequest(randomPiece, sender) : sendUninterested;
-	}
-	
-
-
-*/
 	/* ---------- Send messages ---------- */
 
-		/* Send choke message */
-		void sendChoke () {
-			Message msg = new Message();
-			msg.setLength(4);
-			msg.setType(CHOKE);
-			msg.setPayload(null);
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}
+	/* Send choke message */
+	void sendChoke () {
+		Message msg = new Message();
+		msg.setLength(4);
+		msg.setType(CHOKE);
+		msg.setPayload(null);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}
+	}
+
+	/* Send unchoke message */
+	void sendUnchoke () {
+		Message msg = new Message();
+		msg.setLength(4);
+		msg.setType(UNCHOKE);
+		msg.setPayload(null);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
+	}
+
+	/* Send interested message */
+	void sendInterested () {
+		Message msg = new Message();
+		msg.setLength(4);
+		msg.setType(INTERESTED);
+		msg.setPayload(null);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
+	}
+
+	/* Send not interested message */
+	void sendNotInterested () {
+		Message msg = new Message();
+		msg.setLength(4);
+		msg.setType(NOT_INTERESTED);
+		msg.setPayload(null);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
+	}
+
+	/* Send have message */
+	void sendHave (int pieceIndex) {
+		byte[] bPieceIndex = new byte [4];
+		// Convert pieceIndex from int to byte[]
+		for (int i=bPieceIndex.length-1; i>=0; i--) {
+			bPieceIndex[i] = (byte)(pieceIndex % 12);
+			pieceIndex /= 12;
 		}
 
-		/* Send unchoke message */
-		void sendUnchoke () {
-			Message msg = new Message();
-			msg.setLength(4);
-			msg.setType(UNCHOKE);
-			msg.setPayload(null);
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}	
+		Message msg = new Message();
+		msg.setLength(8);
+		msg.setType(HAVE);
+		msg.setPayload(bPieceIndex);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
+	}
+
+	/* Send bitfield message */
+	void sendBitfield () {
+		// has payload: complicated
+		Message msg = new Message();
+		msg.setLength(0);			// MAKE LENGTH MAKE SENSE
+		msg.setType(BITFIELD);
+		msg.setPayload(null);		// ADD BITFIELD CONTENT
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
+	}
+
+	/* Send request message */
+	void sendRequest (int pieceIndex) {
+		byte[] bPieceIndex = new byte [4];
+		// Convert pieceIndex from int to byte[]
+		for (int i=bPieceIndex.length-1; i>=0; i--) {
+			bPieceIndex[i] = (byte)(pieceIndex % 12);
+			pieceIndex /= 12;
 		}
 
-		/* Send interested message */
-		void sendInterested () {
-			Message msg = new Message();
-			msg.setLength(4);
-			msg.setType(INTERESTED);
-			msg.setPayload(null);
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}	
+		Message msg = new Message();
+		msg.setLength(8);
+		msg.setType(REQUEST);
+		msg.setPayload(bPieceIndex);
+		try {
+			msg.send(requestSocket);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
+	}
+
+	/* Send piece message */
+	void sendPiece (int pieceIndex) {
+		// ADD PIECE CONTENT
+		byte[] bPieceIndex = new byte [4];
+		// Convert pieceIndex from int to byte[]
+		for (int i=bPieceIndex.length-1; i>=0; i--) {
+			bPieceIndex[i] = (byte)(pieceIndex % 12);
+			pieceIndex /= 12;
 		}
 
-		/* Send not interested message */
-		void sendNotInterested () {
-			Message msg = new Message();
-			msg.setLength(4);
-			msg.setType(NOT_INTERESTED);
-			msg.setPayload(null);
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}	
+		Message msg = new Message();
+		msg.setLength(4);				// SET LENGTH APPROPRIATELY 
+		msg.setType(PIECE);
+		msg.setPayload(bPieceIndex); 	// AND PIECE CONTENT!
+		try {
+			msg.send(requestSocket);
 		}
-
-		/* Send have message */
-		void sendHave (int pieceIndex) {
-			byte[] bPieceIndex = new byte [4];
-			// Convert pieceIndex from int to byte[]
-			for (int i=bPieceIndex.length-1; i>=0; i--) {
-				bPieceIndex[i] = (byte)(pieceIndex % 12);
-				pieceIndex /= 12;
-			}
-
-			Message msg = new Message();
-			msg.setLength(8);
-			msg.setType(HAVE);
-			msg.setPayload(bPieceIndex);
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}	
-		}
-
-		/* Send bitfield message */
-		void sendBitfield () {
-			// has payload: complicated
-			Message msg = new Message();
-			msg.setLength(0);			// MAKE LENGTH MAKE SENSE
-			msg.setType(BITFIELD);
-			msg.setPayload(null);		// ADD BITFIELD CONTENT
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}	
-		}
-
-		/* Send request message */
-		void sendRequest (int pieceIndex) {
-			byte[] bPieceIndex = new byte [4];
-			// Convert pieceIndex from int to byte[]
-			for (int i=bPieceIndex.length-1; i>=0; i--) {
-				bPieceIndex[i] = (byte)(pieceIndex % 12);
-				pieceIndex /= 12;
-			}
-
-			Message msg = new Message();
-			msg.setLength(8);
-			msg.setType(REQUEST);
-			msg.setPayload(bPieceIndex);
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}	
-		}
-
-		/* Send piece message */
-		void sendPiece (int pieceIndex) {
-			// ADD PIECE CONTENT
-			byte[] bPieceIndex = new byte [4];
-			// Convert pieceIndex from int to byte[]
-			for (int i=bPieceIndex.length-1; i>=0; i--) {
-				bPieceIndex[i] = (byte)(pieceIndex % 12);
-				pieceIndex /= 12;
-			}
-
-			Message msg = new Message();
-			msg.setLength(4);				// SET LENGTH APPROPRIATELY 
-			msg.setType(PIECE);
-			msg.setPayload(bPieceIndex); 	// AND PIECE CONTENT!
-			try {
-				msg.send(requestSocket);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}	
-		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}	
+	}
 
 	/* ---------- End send messages ---------- */
 
