@@ -187,9 +187,9 @@ public class PeerProcess implements Runnable {
 		int nPeers = getNumPeers(bufferedReader);
 		
 		String line;
-		String hostnames;
-		String ports;
-		BitSet bitfields;
+		String hostname;
+		String port;
+		BitSet bitfield;
 		String hasFile;
 		String peerIDstr;
 
