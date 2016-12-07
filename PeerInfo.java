@@ -5,29 +5,29 @@ import java.nio.*;
 
 public class PeerInfo {
 
-	private final int theirPeerID;
-	private BitSet theirBitField;
-	private final String theirHost;
-	private final Socket theirSocket; //where we interact with this peer
-	private final int theirPort;
-	private boolean theirInterestInMe;
-	private boolean myInterestInThem;
-	private boolean theirChoked;	//haha bad grammar/code theme pun
-	private boolean theirOptimistic;	//lol same as above, got em again!
+	private final 	int 	theirPeerID;
+	private 		BitSet 	theirBitField;
+	private final 	String 	theirHost;
+	private 		Socket 	theirSocket; //where we interact with this peer
+	private final 	int 	theirPort;
+	private 		boolean theirInterestInMe;
+	private 		boolean myInterestInThem;
+	private 		boolean theirChoked;	//haha bad grammar/code theme pun
+	private 		boolean theirOptimistic;	//lol same as above, got em again!
 
 
 	//only values that will be read from PeerConfig need to be in constructor
 	public PeerInfo(int id, String host, int port, boolean hasFile, int nPieces) {
-		this.theirPeerID = id;
-		this.theirHost = host;
-		this.theirPort = port;
-		this.theirInterestInMe = false;
-		this.myInterestInThem = false;
-		this.theirChoked = false;
-		this.theirOptimistic = false;
+		this.theirPeerID 		= id;
+		this.theirHost 			= host;
+		this.theirPort 			= port;
+		this.theirInterestInMe 	= false;
+		this.myInterestInThem 	= false;
+		this.theirChoked 		= false;
+		this.theirOptimistic 	= false;
 
 		if (hasFile) {
-			this.theirBitField = new BitSet(nPieces);
+			this.theirBitField 	= new BitSet(nPieces);
 			this.theirBitField.set(0, nPieces);
 		}
 	}
