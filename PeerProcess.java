@@ -10,6 +10,7 @@ import java.math.BigInteger;
 
 public class PeerProcess implements Runnable {
 
+/* ---------- Initilize Variables ---------- */
 	/* Message types */
 	final 	int 		CHOKE 			= 0; 
 	final 	int 		UNCHOKE 		= 1;
@@ -46,6 +47,8 @@ public class PeerProcess implements Runnable {
 	public ServerSocket listener;			//will fix privacy later
 	ObjectOutputStream 	out;         		//stream write to the socket
 	ObjectInputStream 	in;          			//stream read from the socket
+
+/* ---------- End Initialize Variables ---------- */
 
 	/* Constructor */
 	public PeerProcess(int peerID) {
@@ -139,6 +142,7 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+/* ---------- Configuration ---------- */
 	/* Read Common.cfg */
 	void configureGeneral () {
 		try {
@@ -249,6 +253,8 @@ public class PeerProcess implements Runnable {
 		}
 		return i;
 	}
+
+/* ---------- End Configuration ---------- */
 
 	/* Spin up server */
 	void spinServer(int port) {
@@ -407,7 +413,7 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-/* Check the type of the recieved message and act accordingly */
+	/* Check the type of the recieved message and act accordingly */
 	void messageType(Message msg) {
 		//check message type bit
 		int type = msg.getType();
@@ -493,9 +499,9 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
-	/******* Message Handlers and Helpers *******
+/* ---------- Message Handlers and Helpers ---------- */
 
-
+ 	/*
 	boolean checkInterest(BitSet senderField) {
 		for (piece : senderField) {
 			if (bitfield[piece] == senderField[piece]) {
@@ -515,10 +521,11 @@ public class PeerProcess implements Runnable {
 		}
 		return want;
 	}
-	
-	********************************************/	
+	*/
 
-	/* ---------- Send messages ---------- */
+/* ---------- End Message Handlers and Helpers ---------- */
+
+/* ---------- Send messages ---------- */
 
 	/* Send choke message */
 	void sendChoke () {
@@ -655,7 +662,7 @@ public class PeerProcess implements Runnable {
 		}	
 	}
 
-	/* ---------- End send messages ---------- */
+/* ---------- End send messages ---------- */
 
 	/* Get message length */
 	int messageLength(byte[] ml) {
@@ -667,8 +674,6 @@ public class PeerProcess implements Runnable {
 		return new BigInteger(meslen).intValue();
 		
 	}
-
-	/* TODO: Create files and folders if they don't exist */
 	
 	/* TODO: Write logs */
 
