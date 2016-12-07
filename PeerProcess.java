@@ -29,7 +29,7 @@ public class PeerProcess implements Runnable {
 	private int pieceSize;
 
 	/* unique peer properites */
-	//todo: peers
+	//todo: list of peers
 	private int port;
 	private String host;
 	private boolean gotFile;
@@ -68,7 +68,7 @@ public class PeerProcess implements Runnable {
 			//get Input from standard input
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 			//first, send a handshake with the peer ID
-			handshake(1010);	//placeholder peer id
+			handshake(1002);	//placeholder peer id
 			//Receive the handshake from the server
 			MESSAGE = (byte [])in.readObject();
 			//check whether the handshake is valid and if not, no further connection
@@ -113,6 +113,64 @@ public class PeerProcess implements Runnable {
 			}
 			catch(IOException ioException){
 				ioException.printStackTrace();
+			}
+		}
+	}
+
+	/* TODO: read common.cfg */
+	void configureGeneral () {
+		// add a try statement
+
+		FileReader fileReader = new FileReader("Common.cfg");
+		BufferedReader bufferedReader = new BufferedReader(fileReader);u
+		StringTokenizer tokens;
+
+		line = bufferedReader.readLine();
+		tokens = line ? new StringTokenizer(line) : null;
+		numberOfPerferredNeighbors = tokens ? tokens[1] : null;
+
+		unchokingInterval;
+		optimisticUnchokingInterval;
+		fileName;
+		fileSize;
+		pieceSize;
+		
+		while ((line = bufferedReader.readLine()) != null) {
+			
+		}
+	}
+
+	/* TODO: Read Config File */
+	void configurePeer() {
+		FileReader fileReader = new FileReader("PeerInfo.cfg");
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+		String line = null;
+		String peerID = "";
+		String hostname = "";
+		String port = "";
+		String hasFile = "";
+		//int sPort = 8000;
+		int i = 0;
+		
+		while ((line = bufferedReader.readLine()) != null) {
+			System.out.println(line + "\n");
+			listenerArr[i] = new ServerSocket(sPort++
+			);
+			StringTokenizer tokens = new StringTokenizer(line);
+			if (tokens.countTokens() < 4) {
+				// throw too few tokens
+			} else if (tokens.countTokens() > 4) {
+				// throw too many tokens
+			}
+			peerID = tokens.nextToken();
+			hostname = tokens.nextToken();
+			port = tokens.nextToken();
+			hasFile = tokens.nextToken();
+			System.out.println("almost new\n");
+			while (true) {
+				new Handler (listenerArr[i++].accept(),peerID, hostname).start();
+				System.out.println("end\n");
 			}
 		}
 	}
@@ -297,41 +355,84 @@ public class PeerProcess implements Runnable {
 		//check message type bit
 		int type = msg.getType();
 
-		if (type == CHOKE) 
+		if (type == BITFIELD) 
 		{
-			// choke
-		}
-		else if (type == UNCHOKE)
-		{
-			// unchoke
-			// send requests!
+			//add bitfield to datastructure that tracks each peer's bitfield
+			//compare to this peer's bitfield to see if there is any interest
+			//send interested/not interested
 		}
 		else if (type == INTERESTED) 
 		{
-			//interested
+			//add to list of peers interested in this peer's data
 		}
 		else if (type == NOT_INTERESTED) 
 		{
-			//not interested
+			//if was on list of peers interested in this peer's data, remove it
 		}
-		else if (type == HAVE) 
+		else if (type == CHOKE) 
 		{
-			//have
+			//stop sending requests?
+			//log and exit/go back to waiting for messages I guess
 		}
-		else if (type == BITFIELD) 
+		else if (type == UNCHOKE)
 		{
-			//bitfield
+			// send requests
 		}
 		else if (type == REQUEST) 
 		{
-			//request
+			//send piece message back with requested piece
 		}
 		else if (type == PIECE)
 		{
-			//piece
+			//update bitfield, data
+			//send have to everyone with updated bitfield
+			//check if still interested in current peer, if yes request
+			//else send not interested
+			//finally check to see if file is complete, if yes enter random selected neighbors mode
+		}
+		else if (type == HAVE) 
+		{
+			//update tracked bitfield for sender
+			//reevaluate interest/non-interest
 		}
 	}
+/******* Message Handlers *******
 
+
+	boolean receivedBitfield(BitSet senderField, sender) {
+
+		bitfield is a BitSet where each index represents a piece the peer either has or does not have
+		update sender's bitfield
+
+		return interested ? true : false;
+	}
+	
+	void receivedInterested(int sender) {
+		interestedSet.add(sender);		//or something similar
+	}
+
+	void receivedUninterested(int sender) {
+		interestSet.remove(objectForKey(sender));
+	}
+
+	void receivedUnchoke(int sender) {
+		find pieces interested in
+		sendRequest(randomPiece, sender);
+	}
+
+	void receivedRequest(int sender, int pieceIndex) {
+		sendPiece(sender, piece);
+	}
+
+	void receivedPiece(int sender, byte[] piece, int pieceIndex) {
+		data.add(piece);
+		bitfield[pieceIndex] = true;
+		interested ? sendRequest(randomPiece, sender) : sendUninterested;
+	}
+	
+
+
+*/
 	/* ---------- Send messages ---------- */
 
 	/* Send choke message */
@@ -482,63 +583,7 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-	/* TODO: read common.cfg */
-	void configureGeneral () {
-		// add a try statement
-
-		FileReader fileReader = new FileReader("Common.cfg");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);u
-		StringTokenizer tokens;
-
-		line = bufferedReader.readLine();
-		tokens = line ? new StringTokenizer(line) : null;
-		numberOfPerferredNeighbors = tokens ? tokens[1] : null;
-
-		unchokingInterval;
-		optimisticUnchokingInterval;
-		fileName;
-		fileSize;
-		pieceSize;
-		
-		while ((line = bufferedReader.readLine()) != null) {
-			
-		}
-	}
-
-	/* TODO: Read Config File */
-	void configurePeer() {
-		FileReader fileReader = new FileReader("PeerInfo.cfg");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-		String line = null;
-		String peerID = "";
-		String hostname = "";
-		String port = "";
-		String hasFile = "";
-		//int sPort = 8000;
-		int i = 0;
-		
-		while ((line = bufferedReader.readLine()) != null) {
-			System.out.println(line + "\n");
-			listenerArr[i] = new ServerSocket(sPort++
-			);
-			StringTokenizer tokens = new StringTokenizer(line);
-			if (tokens.countTokens() < 4) {
-				// throw too few tokens
-			} else if (tokens.countTokens() > 4) {
-				// throw too many tokens
-			}
-			peerID = tokens.nextToken();
-			hostname = tokens.nextToken();
-			port = tokens.nextToken();
-			hasFile = tokens.nextToken();
-			System.out.println("almost new\n");
-			while (true) {
-				new Handler (listenerArr[i++].accept(),peerID, hostname).start();
-				System.out.println("end\n");
-			}
-		}
-	}
+	
 
 	/* TODO: Create files and folders if they don't exist */
 	
@@ -553,10 +598,6 @@ public class PeerProcess implements Runnable {
 		//spin a thread and start the peer
 		Thread peer_thread = new Thread(peer);
 		peer_thread.start();
-
-		//I left this in case anyone was still using client, but it works all inside PeerProcess now
-		//Client client = new Client();
-		//client.run();
 	}
 
 	// Reading from files (need to create the file structure too, peer_[id])
