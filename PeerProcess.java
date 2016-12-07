@@ -46,6 +46,8 @@ public class PeerProcess implements Runnable {
 	ObjectOutputStream out;         		//stream write to the socket
 	ObjectInputStream in;          			//stream read from the socket
 
+	private PeerInfo[] peers;
+
 	/* Constructor */
 	public PeerProcess(int peerID) {
 		this.peerID = peerID;
@@ -186,11 +188,13 @@ public class PeerProcess implements Runnable {
 
 		int nPeers = getNumPeers(bufferedReader);
 		
+		// create array of PeerInfo's to store all peers
+		peers = new PeerInfo[nPeers];
+
 		String line;
 		String hostname;
-		String port;
-		BitSet bitfield;
-		String hasFile;
+		int port;
+		boolean hasFile;
 		String peerIDstr;
 
 		try {
@@ -199,21 +203,25 @@ public class PeerProcess implements Runnable {
 			peerIDstr = Integer.toString(peerID);
 			while ((line = bufferedReader.readLine()) != null) {
 				StringTokenizer tokens = new StringTokenizer(line);
-				if (tokens.countTokens() < 4) {
-					// throw too few tokens
-				} else if (tokens.countTokens() > 4) {
-					// throw too many tokens
+				if (tokens.countTokens() == 4) {
+					peerID 		= Integer.parseInt(tokens.nextToken());
+					hostname 	= tokens.nextToken();
+					port 		= Integer.parseInt(tokens.nextToken());
+					hasFile 	= (tokens.nextToken() == "1") ? true : false;
+
+					// create new peer and add to array
+					peers[i++] 	= new PeerInfo(peerID, hostname, port, hasFile, nPieces);
 				} else if (tokens.nextToken() == peerIDstr) {
-					hostname = tokens.nextToken();
-					port = tokens.nextToken();
-					hasFile = tokens.nextToken();
-				}
+					hostname 	= tokens.nextToken();
+					port 		= Integer.parseInt(tokens.nextToken());
+					hasFile 	= (tokens.nextToken() == "1") ? true : false;
+				} 
 			}
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 		// if this process has the file
-		if (hasFile == "1") {
+		if (hasFile) {
 			// set bitfield to all ones
 			bitfield.set(0,nPieces-1);
 
@@ -227,7 +235,7 @@ public class PeerProcess implements Runnable {
 			} catch (Exception e) {	 // if file doesn't exist
 				System.out.println(e);
 			}
-		}
+		} 
 	}
 
 	/* Count number of peers in PeerInfo.cfg */
