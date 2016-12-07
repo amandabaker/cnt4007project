@@ -17,15 +17,19 @@ public class PeerInfo {
 
 
 	//only values that will be read from PeerConfig need to be in constructor
-	public PeerInfo(int id, String host, Socket socket, int port) {
+	public PeerInfo(int id, String host, int port, boolean hasFile, int nPieces) {
 		this.theirPeerID = id;
 		this.theirHost = host;
-		this.theirSocket = socket;
 		this.theirPort = port;
 		this.theirInterestInMe = false;
 		this.myInterestInThem = false;
 		this.theirChoked = false;
 		this.theirOptimistic = false;
+
+		if (hasFile) {
+			this.theirBitField = new BitSet(nPieces);
+			this.theirBitField.set(0, nPieces);
+		}
 	}
 
 	/* Getters */
