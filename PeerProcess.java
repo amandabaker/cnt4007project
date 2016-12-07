@@ -11,40 +11,41 @@ import java.math.BigInteger;
 public class PeerProcess implements Runnable {
 
 	/* Message types */
-	final int CHOKE 			= 0; 
-	final int UNCHOKE 			= 1;
-	final int INTERESTED 		= 2;
-	final int NOT_INTERESTED 	= 3;
-	final int HAVE 				= 4;
-	final int BITFIELD 			= 5;
-	final int REQUEST 			= 6;
-	final int PIECE 			= 7;
+	final 	int 		CHOKE 			= 0; 
+	final 	int 		UNCHOKE 		= 1;
+	final 	int 		INTERESTED 		= 2;
+	final 	int 		NOT_INTERESTED 	= 3;
+	final 	int 		HAVE 			= 4;
+	final 	int 		BITFIELD 		= 5;
+	final 	int 		REQUEST 		= 6;
+	final 	int 		PIECE 			= 7;
 
 	/* common properties from Common.cfg */
-	private int numberOfPerferredNeighbors;
-	private int unchokingInterval;
-	private int optimisticUnchokingInterval;
-	private String fileName;
-	private int fileSize;
-	private int pieceSize;
-
-	private int nPieces;
+	private int 		numberOfPerferredNeighbors;
+	private int 		unchokingInterval;
+	private int 		optimisticUnchokingInterval;
+	private String 		fileName;
+	private int 		fileSize;
+	private int 		pieceSize;
+	private int 		nPieces;
 
 	/* unique peer properites */
-	private PeerInfo[] peers;
-	private int port;
-	private String host;
-	private boolean gotFile;
-	private BitSet bitfield;
-	private byte [][] data;
+	private int 		port;
+	private int 		nPeers;
+	private String 		host;
+	private boolean 	gotFile;
+	private BitSet 		bitfield;
+	private byte [][] 	data;
+	private PeerInfo []	peers;
 
-	private int peerID;						//id for this peer
-	private byte [] MESSAGE;
-	private String message;
-	private Socket requestSocket;           //socket to connect to the server
+	private int 		peerID;						//id for this peer
+	private byte [] 	MESSAGE;
+	private String 		message;
+	private Socket 		requestSocket;           //socket to connect to the server
+	
 	public ServerSocket listener;			//will fix privacy later
-	ObjectOutputStream out;         		//stream write to the socket
-	ObjectInputStream in;          			//stream read from the socket
+	ObjectOutputStream 	out;         		//stream write to the socket
+	ObjectInputStream 	in;          			//stream read from the socket
 
 	/* Constructor */
 	public PeerProcess(int peerID) {
@@ -181,10 +182,8 @@ public class PeerProcess implements Runnable {
 		bitfield 	= new BitSet(nPieces);
 		data 		= new byte[nPieces][pieceSize];
 
-		FileReader fileReader;
-		BufferedReader bufferedReader;
-
-		int nPeers;
+		FileReader 		fileReader;
+		BufferedReader 	bufferedReader;
 
 		String 	line		= "";
 		String 	hostname	= "";
@@ -193,13 +192,13 @@ public class PeerProcess implements Runnable {
 		String 	peerIDstr 	= "";
 
 		try {
-			fileReader = new FileReader("PeerInfo.cfg");
-			bufferedReader = new BufferedReader(fileReader);
+			fileReader 		= new FileReader("PeerInfo.cfg");
+			bufferedReader 	= new BufferedReader(fileReader);
 
-			nPeers = getNumPeers(bufferedReader);
-			peers = new PeerInfo[nPeers];
+			nPeers 	= getNumPeers(bufferedReader);
+			peers 	= new PeerInfo[nPeers];
 
-			int i = 0;
+			int i 	= 0;
 			
 			peerIDstr = Integer.toString(peerID);
 			while ((line = bufferedReader.readLine()) != null) {
