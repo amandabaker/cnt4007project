@@ -183,21 +183,24 @@ public class PeerProcess implements Runnable {
 		bitfield 	= new BitSet(nPieces);
 		data 		= new byte[nPieces][pieceSize];
 
-		FileReader fileReader = new FileReader("PeerInfo.cfg");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		FileReader fileReader;
+		BufferedReader bufferedReader;
 
-		int nPeers = getNumPeers(bufferedReader);
-		
-		// create array of PeerInfo's to store all peers
-		peers = new PeerInfo[nPeers];
+		int nPeers;
 
-		String line;
-		String hostname;
-		int port;
-		boolean hasFile;
-		String peerIDstr;
+		String 	line		= "";
+		String 	hostname	= "";
+		int 	port 		= 0;
+		boolean hasFile 	= false;
+		String 	peerIDstr 	= "";
 
 		try {
+			fileReader = new FileReader("PeerInfo.cfg");
+			bufferedReader = new BufferedReader(fileReader);
+
+			nPeers = getNumPeers(bufferedReader);
+			peers = new PeerInfo[nPeers];
+
 			int i = 0;
 			
 			peerIDstr = Integer.toString(peerID);
@@ -217,31 +220,36 @@ public class PeerProcess implements Runnable {
 					hasFile 	= (tokens.nextToken() == "1") ? true : false;
 				} 
 			}
+			if (hasFile) {
+				// set bitfield to all ones
+				bitfield.set(0,nPieces-1);
+
+				// store data
+				String file = "./peer_" + peerIDstr + "/" + fileName;
+				try {
+					FileInputStream fileInput = new FileInputStream(file);
+					for (int j=0; i<nPieces; j++) {
+						fileInput.read(data[j]);
+					}
+				} catch (Exception e) {	 // if file doesn't exist
+					System.out.println(e);
+				}
+			} 
 		} catch (Exception e) {
 			System.out.println(e);
-		}
-		// if this process has the file
-		if (hasFile) {
-			// set bitfield to all ones
-			bitfield.set(0,nPieces-1);
-
-			// store data
-			String file = "./peer_" + peerIDstr + "/" + fileName;
-			try {
-				FileInputStream fileInput = new FileInputStream(file);
-				for (int i=0; i<nPieces; i++) {
-					fileInput.read(data[i]);
-				}
-			} catch (Exception e) {	 // if file doesn't exist
-				System.out.println(e);
-			}
-		} 
+		}		
 	}
 
 	/* Count number of peers in PeerInfo.cfg */
 	int getNumPeers (BufferedReader bufferedReader) {
 		int i = 0;
-		while (bufferedReader.readLine() != null) i++;
+		try {
+			while (bufferedReader.readLine() != null) i++;
+			// Reset reader to top of file
+			bufferedReader.reset();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		return i;
 	}
 
