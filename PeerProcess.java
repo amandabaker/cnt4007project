@@ -228,7 +228,7 @@ public class PeerProcess implements Runnable {
 			}
 		}
 	}
-	
+
 	/* Spin up server */
 	void spinServer(int port) {
 
@@ -434,7 +434,6 @@ public class PeerProcess implements Runnable {
 	}
 /******* Message Handlers *******
 
-
 	boolean receivedBitfield(BitSet senderField, sender) {
 
 		bitfield is a BitSet where each index represents a piece the peer either has or does not have
@@ -634,43 +633,6 @@ public class PeerProcess implements Runnable {
 		Thread peer_thread = new Thread(peer);
 		peer_thread.start();
 	}
-
-	// Reading from files (need to create the file structure too, peer_[id])
-	/*
-	// ----- TODO: Read Common.cfg
-
-	// ----- TODO: Read PeerInfo.cfg
-	FileReader fileReader = new FileReader("PeerInfo.cfg");
-	BufferedReader bufferedReader = new BufferedReader(fileReader);
-	
-	String line = null;
-	String peerID = "";
-	String hostname = "";
-	String port = "";
-	String hasFile = "";
-	//int sPort = 8000;
-	int i = 0;
-	
-	while ((line = bufferedReader.readLine()) != null) {
-		System.out.println(line + "\n");
-		listenerArr[i] = new ServerSocket(sPort++
-		);
-		StringTokenizer tokens = new StringTokenizer(line);
-		if (tokens.countTokens() < 4) {
-			// throw too few tokens
-		} else if (tokens.countTokens() > 4) {
-			// throw too many tokens
-		}
-		peerID = tokens.nextToken();
-		hostname = tokens.nextToken();
-		port = tokens.nextToken();
-		hasFile = tokens.nextToken();
-		System.out.println("almost new\n");
-		while (true) {
-			new Handler (listenerArr[i++].accept(),peerID, hostname).start();
-			System.out.println("end\n");
-		}
-	}*/
 
 }
 
