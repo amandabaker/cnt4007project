@@ -31,7 +31,7 @@ public class PeerProcess implements Runnable {
 	private int nPieces;
 
 	/* unique peer properites */
-	//todo: list of peers
+	private PeerInfo[] peers;
 	private int port;
 	private String host;
 	private boolean gotFile;
@@ -45,8 +45,6 @@ public class PeerProcess implements Runnable {
 	public ServerSocket listener;			//will fix privacy later
 	ObjectOutputStream out;         		//stream write to the socket
 	ObjectInputStream in;          			//stream read from the socket
-
-	private PeerInfo[] peers;
 
 	/* Constructor */
 	public PeerProcess(int peerID) {
