@@ -2,6 +2,8 @@ import java.util.*;
 import java.lang.*;
 import java.net.*;
 import java.nio.*;
+import java.nio.file.*;
+import java.io.*;
 
 public class PeerInfo {
 
@@ -14,6 +16,8 @@ public class PeerInfo {
 	private 		boolean myInterestInThem;
 	private 		boolean theirChoked;	//haha bad grammar/code theme pun
 	private 		boolean theirOptimistic;	//lol same as above, got em again!
+	private static 	Path 	logFile;
+	private static  Path 	directory;
 
 
 	//only values that will be read from PeerConfig need to be in constructor
@@ -25,10 +29,36 @@ public class PeerInfo {
 		this.myInterestInThem 	= false;
 		this.theirChoked 		= false;
 		this.theirOptimistic 	= false;
-
+		
 		if (hasFile) {
 			this.theirBitField 	= new BitSet(nPieces);
 			this.theirBitField.set(0, nPieces);
+		}
+
+		String nameLogFile 	= "log_peer_" + Integer.toString(theirPeerID) + ".log";
+		String nameDirectory= "peer_" + Integer.toString(theirPeerID);
+		
+		this.logFile 	= Paths.get (nameLogFile);
+		this.directory 	= Paths.get (nameDirectory);
+
+		// Create log file
+		try {
+			Files.createFile (logFile);
+		} catch (IOException f) {
+			System.out.println("The log file for " + Integer.toString(theirPeerID) + " already exists. \n" +
+							   "The old file will be appended with new data.");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+		// Create storage directory
+		try {
+			Files.createDirectory (directory);
+		} catch (IOException f) {
+			System.out.println("The log directory for " + Integer.toString(theirPeerID) + " already exists. \n" + 
+							   "The old directory will be kept and any new files added here.");
+		} catch (Exception e) {
+			System.out.println(e);
 		}
 	}
 
