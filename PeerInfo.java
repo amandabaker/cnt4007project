@@ -63,39 +63,49 @@ public class PeerInfo {
 	}
 
 	/* Getters */
-	public int getPeerId() {
+	public int getPeerId () {
 		return theirPeerID;
 	}
 
-	public BitSet getBitField() {
+	public BitSet getBitField () {
 		return theirBitField;
 	}
 
-	public String getHost() {
+	public String getHost () {
 		return theirHost;
 	}
 
-	public Socket getSocket() {
+	public Socket getSocket () {
 		return theirSocket;
 	}
 
-	public int getPort() {
+	public int getPort () {
 		return theirPort;
 	}
 
-	public boolean getTheirInterest() {
+	public boolean getTheirInterest () {
 		return theirInterestInMe;
 	}
 	
-	public boolean getMyInterest() {
+	public boolean getMyInterest () {
 		return myInterestInThem;
 	}
-	public boolean getChoked() {
+	public boolean getChoked () {
 		return theirChoked;
 	}
-	public boolean getOptimistic() {
+
+	public boolean getOptimistic () {
 		return theirOptimistic;
 	}
+
+	public Path getLogFile () {
+		return logFile;
+	}
+
+	public Path getDirectory () {
+		return directory;
+	}
+
 
 	/* Setters */
 
