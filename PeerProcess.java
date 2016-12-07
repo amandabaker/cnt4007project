@@ -398,7 +398,7 @@ public class PeerProcess implements Runnable {
 	void messageType(Message msg) {
 		//check message type bit
 		int type = msg.getType();
-		int sender = msg.getPeerID();
+		//int sender = msg.getPeerID();
 
 		if (type == BITFIELD) 
 		{

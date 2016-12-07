@@ -21,10 +21,11 @@ public class Message {
         payload = null;
     }
 
-    public Message (int type, byte[] payload) {
+    public Message (int type, byte[] payload, int peerID) {
         length = 0;
         this.type = type;
         this.payload = payload;
+        this.peerID = peerID;
     }
 
     public void send (Socket s) throws IOException {
@@ -67,5 +68,9 @@ public class Message {
 
     public byte[] getPayload () {
         return payload;
+    }
+
+    public int getPeerID() {
+        return peerID;
     }
 }
