@@ -22,6 +22,10 @@ public class PeerInfo {
 		this.theirHost = host;
 		this.theirSocket = socket;
 		this.theirPort = port;
+		this.theirInterestInMe = false;
+		this.myInterestInThem = false;
+		this.theirChoked = false;
+		this.theirOptimistic = false;
 	}
 
 	/* Getters */
