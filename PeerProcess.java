@@ -8,6 +8,7 @@ import java.util.*;
 import java.lang.*;
 import java.math.BigInteger;
 import java.time.LocalTime;
+import java.nio.file.*;
 
 public class PeerProcess implements Runnable {
 
@@ -147,17 +148,18 @@ public class PeerProcess implements Runnable {
 
 /* ---------- Configuration ---------- */
 
+	/* Configures everything, including the 3 following functions */
 	void configure () {
-		String nameLogFile 	= "log_peer_" + Integer.toString(theirPeerID) + ".log";
-		String nameDirectory= "peer_" + Integer.toString(theirPeerID);
+		String nameLogFile 	= "log_peer_" + peerID + ".log";
+		String nameDirectory= "peer_" + peerID;
 		
 		logPath			= Paths.get (nameLogFile);
-		directorPath	= Paths.get (nameDirectory);
+		directoryPath	= Paths.get (nameDirectory);
 
 		try {
 			Files.createFile (logPath);
 		} catch (IOException f) {
-			System.out.println("The log file for " + Integer.toString(theirPeerID) + " already exists. \n" +
+			System.out.println("The log file for " + peerID + " already exists. \n" +
 							   "The old file will be appended with new data.");
 		} catch (Exception e) {
 			System.out.println(e);
@@ -165,14 +167,18 @@ public class PeerProcess implements Runnable {
 
 		// Create storage directory
 		try {
-			Files.createDirectory (directory);
+			Files.createDirectory (directoryPath);
 		} catch (IOException f) {
-			System.out.println("The log directory for " + Integer.toString(theirPeerID) + " already exists. \n" + 
+			System.out.println("The log directory for " + peerID + " already exists. \n" + 
 							   "The old directory will be kept and any new files added here.");
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+
+		configureGeneral();
+		configurePeer();
 	}
+
 	/* Read Common.cfg */
 	void configureGeneral () {
 		try {
@@ -710,7 +716,7 @@ public class PeerProcess implements Runnable {
 	/* Writer for all cases */
 	void writeLog (Path logPath, String logData) {
 		try {
-			Files.write(logPath, logData, StandardOpenOperation.APPEND);
+			Files.write(logPath, logData.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException f) {
 			System.out.println("Cannot print \"" + logData + "\" to " + logPath);
 		} catch (Exception e) {
@@ -719,18 +725,16 @@ public class PeerProcess implements Runnable {
 	}
 
 	void logTCP (LocalTime time, int theirPeerID) {
-		String peer1 = Integer.toString(peerID);
-		String peer2 = Integer.toString(theirPeerID);
-		String logData = time.toString() + ": Peer " + peer1 + " makes a connection to Peer " + peer2 + ".";
+		String logData = time.toString() + ": Peer " + peerID + " makes a connection to Peer " + theirPeerID + ".";
 		writeLog(logPath, logData);
 	}
 
 	void logChangeOfPreferredNeighbors (LocalTime time, int [] preferredPeerIDs) {
-		String logData = time.toString() + ": Peer " + peer1 + " has the preferred neighbors";
-		if (preferredPeerIDs.length() > 0) {
+		String logData = time.toString() + ": Peer " + peerID + " has the preferred neighbors";
+		if (preferredPeerIDs.length > 0) {
 			logData += " " + preferredPeerIDs[0];
 		}
-		for (int i=1; i<preferredPeerIDs.length(); i++) {
+		for (int i=1; i<preferredPeerIDs.length; i++) {
 			logData += ", " + preferredPeerIDs[i];
 		}
 		logData += ".";
@@ -760,12 +764,12 @@ public class PeerProcess implements Runnable {
 	}
 
 	void logInterested (LocalTime time, int theirPeerID) {
-		String logData = time.toString() + ": Peer " + peerID + " received the 'interested' message from " + theirPeerID ".";
+		String logData = time.toString() + ": Peer " + peerID + " received the 'interested' message from " + theirPeerID + ".";
 		writeLog(logPath, logData);
 	}
 
 	void logNotInterested (LocalTime time, int theirPeerID) {
-		String logData = time.toString() + ": Peer " + peerID + " received the 'not interested' message from " + theirPeerID ".";
+		String logData = time.toString() + ": Peer " + peerID + " received the 'not interested' message from " + theirPeerID + ".";
 		writeLog(logPath, logData);
 	}
 
