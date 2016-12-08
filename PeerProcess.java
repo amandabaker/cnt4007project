@@ -68,12 +68,6 @@ public class PeerProcess implements Runnable {
 		if (peerID == 1001) {
 			startupPeer(peerID);
 		}
-		
-		
-
-		//System.out.println("test1");
-		//System.out.println("PeerID is: " + peerID);
-		configure();
 
 		try {
 			requestSocket = new Socket("localhost", 8000);
@@ -109,8 +103,6 @@ public class PeerProcess implements Runnable {
 				String bytestring = new String(MESSAGE, StandardCharsets.UTF_8);
 				
 				System.out.println("Receive message: " + bytestring);
-
-
 			}
 
 		} catch (Exception e) {
@@ -132,15 +124,9 @@ public class PeerProcess implements Runnable {
 			}
 		}
 
-	
-
-		
-
-		
-
 		//initialize me captain
 		//startupPeer(peerID);
-		 /*
+		/*
 		try {
 			configure();
 			//initialize me captain
@@ -158,7 +144,6 @@ public class PeerProcess implements Runnable {
 			//first, send a handshake with the peer ID
 			handshake(1002);	//placeholder peer id
 			//Receive the handshake from the server
-			
 		 */
 	}
 
