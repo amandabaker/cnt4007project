@@ -28,6 +28,12 @@ public class Message {
         this.peerID = peerID;
     }
 
+    public Message (byte[] payload) {
+        length  = -1;
+        type    = -1;
+        this.payload = payload;
+    }
+
     public void send (Socket s) throws IOException {
 
         // set length before sending
@@ -35,9 +41,9 @@ public class Message {
         // get output stream from socket
         OutputStream out = s.getOutputStream();
         // 1. send length
-        out.write((byte)length);
+        if (length < 0) out.write((byte)length);
         // 2. send type
-        out.write((byte)type);
+        if (type < 0) out.write((byte)type);
         // 3. send payload (if any)
         if (payload != null) {
             out.write(payload);
