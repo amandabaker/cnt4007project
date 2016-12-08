@@ -513,7 +513,7 @@ public class PeerProcess implements Runnable {
 		int type = msg.getType();
 		int sender = msg.getPeerID();
 		int senderIndex = 0;
-/*
+
 		if (type == BITFIELD) 
 		{
 			//add bitfield to datastructure that tracks each peer's bitfield
@@ -577,7 +577,7 @@ public class PeerProcess implements Runnable {
 			
 			//Add piece to data, broadcast updated bitfield
 			
-			/**/
+			
 
 			for(int i = 0; i < (nPeers - 1); i++) {
 				sendHave(peers[i].getSocket(), extractIndex(msg.getPayload()));
@@ -607,7 +607,7 @@ public class PeerProcess implements Runnable {
 				sendNotInterested(peers[senderIndex].getSocket()); //assuming we send to socket
 			}
 		}
-		*/
+		
 	}
 
 	int getRandomIndex(int peerIndex) {
