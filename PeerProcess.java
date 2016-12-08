@@ -459,7 +459,7 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-		void messageType(Message msg) {
+	void messageType(Message msg) {
 		//check message type bit
 		int type = msg.getType();
 		int sender = msg.getPeerID();
@@ -529,6 +529,13 @@ public class PeerProcess implements Runnable {
 			//Add piece to data, broadcast updated bitfield
 			
 			/**/
+
+			byte[] temp = msg.getPayload();
+			byte[] temp2 = new byte[temp.length-4];
+			for (int i=0; i < temp.length-4; i++) {
+				temp2[i] = temp[i+4];
+			}
+			writePiece(temp2, extractIndex(temp));
 
 			for(int i = 0; i < (nPeers - 1); i++) {
 				sendHave(peers[i].getSocket(), extractIndex(msg.getPayload()));
