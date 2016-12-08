@@ -161,7 +161,7 @@ public class PeerProcess implements Runnable {
 		try {
 			Files.createFile (logPath);
 		} catch (IOException f) {
-			System.out.println("The log file for " + peerID + " already exists.";
+			System.out.println("The log file for " + peerID + " already exists.");
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -170,7 +170,7 @@ public class PeerProcess implements Runnable {
 		try {
 			Files.createDirectory (directoryPath);
 		} catch (IOException f) {
-			System.out.println("The log directory for " + peerID + " already exists. ";
+			System.out.println("The log directory for " + peerID + " already exists.");
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -591,7 +591,7 @@ public class PeerProcess implements Runnable {
 	}
 
 	/* Send interested message */
-	void sendInterested () {
+	void sendInterested (Socket s) {
 		Message msg = new Message();
 		msg.setLength(1);
 		msg.setType(INTERESTED);
