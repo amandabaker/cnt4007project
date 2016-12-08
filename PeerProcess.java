@@ -228,9 +228,6 @@ public class PeerProcess implements Runnable {
 		bitfield 	= new BitSet(nPieces);
 		data 		= new byte[nPieces][pieceSize];
 
-		FileReader 		fileReader;
-		BufferedReader 	bufferedReader;
-
 		String 	line		= "";
 		String 	hostname	= "";
 		int 	port 		= 0;
@@ -238,17 +235,11 @@ public class PeerProcess implements Runnable {
 		String 	peerIDstr 	= "";
 
 		try {
-			fileReader 		= new FileReader("PeerInfo.cfg");
-			bufferedReader 	= new BufferedReader(fileReader);
-
-			nPeers 	= getNumPeers(bufferedReader);
+			nPeers 	= getNumPeers();
 			peers 	= new PeerInfo[nPeers];
 
-			bufferedReader.close();
-			fileReader.close();
-
-			fileReader 		= new FileReader("PeerInfo.cfg");
-			bufferedReader 	= new BufferedReader(fileReader);
+			FileReader fileReader 			= new FileReader("PeerInfo.cfg");
+			BufferedReader bufferedReader 	= new BufferedReader(fileReader);
 
 			System.out.println("created peers");
 
@@ -292,12 +283,18 @@ public class PeerProcess implements Runnable {
 	}
 
 	/* Count number of peers in PeerInfo.cfg */
-	int getNumPeers (BufferedReader bufferedReader) {
+	int getNumPeers () {
 		int i = 0;
 		try {
+			FileReader fileReader 			= new FileReader("PeerInfo.cfg");
+			BufferedReader bufferedReader 	= new BufferedReader(fileReader);
+			
 			while (bufferedReader.readLine() != null) i++;
 			// Reset reader to top of file
 			bufferedReader.reset();
+
+			bufferedReader.close();
+			fileReader.close();
 		} catch (Exception e) {
 			System.out.println(e);
 		}
