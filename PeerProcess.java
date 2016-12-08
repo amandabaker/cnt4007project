@@ -459,7 +459,7 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-	void messageType(Message msg) {
+		void messageType(Message msg) {
 		//check message type bit
 		int type = msg.getType();
 		int sender = msg.getPeerID();
@@ -474,7 +474,7 @@ public class PeerProcess implements Runnable {
 			//update sender's bitfield
 
 			peers[senderIndex].setTheirBitField(extractBitfield(msg.getPayload())); //peers[] is an array of PeerInfo instances, one for each neighbor
-			boolean check = checkInterest(msg.getPayload());
+			boolean check = checkInterest(senderIndex);
 			if (check) {
 				sendInterested(peers[senderIndex].getSocket()); 
 			} else {
@@ -549,7 +549,7 @@ public class PeerProcess implements Runnable {
 		
 			//update sender's bitfield
 			peers[senderIndex].setTheirBitField(extractBitfield(msg.getPayload())); //peers[] is an array of PeerInfo instances, one for each neighbor
-			boolean check = checkInterest(msg.getPayload());
+			boolean check = checkInterest(senderIndex);
 			if (check) {
 				sendInterested(peers[senderIndex].getSocket());
 			} else {
@@ -574,6 +574,26 @@ public class PeerProcess implements Runnable {
 			index += Byte.valueOf(payload[i]).intValue();
 		}
 		return index;
+	}
+
+	boolean checkInterest(int index) {
+		BitSet bf = peers[index].getBitField();
+		for (int i = 0; i < bf.length; i++) {
+			if ((bitfield.get(i) == bf.get(i)) && (bf.get(i) == true)) {
+				return true;	//there's at least one piece this peer is interested in
+			}
+		}
+		return false;	//there's nothing the sender has that this peer wants
+	}
+	ArrayList<Integer> findWantedPieces(int index) {
+		BitSet bf = peers[index].getBitField();
+		ArrayList<Integer> want = new ArrayList<Integer>();
+		for (int i = 0; i < peers; i++) {
+			if ((bitfield.get(i) != bf.get(i)) && (bf.get(i) == true)) {
+				want.add(i);	//append the index of the piece they have that we want
+			}
+		}
+		return want;
 	}
 
 /* ---------- Message Handlers and Helpers ---------- */
