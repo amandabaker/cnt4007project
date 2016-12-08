@@ -38,7 +38,7 @@ public class PeerProcess implements Runnable {
 	private String 		host;
 	private boolean 	gotFile;
 	private BitSet 		bitfield;
-	private byte [][] 	data;
+	private byte [] 	fileData;
 	private PeerInfo []	peers;
 	private Path 		logPath;
 	private Path 		filePath;
@@ -219,6 +219,7 @@ public class PeerProcess implements Runnable {
 		}
 		// NOTE: THIS MIGHT NOT WORK
 		filePath = Paths.get(fileName);
+		System.out.println(filePath.toString());
 	}
 
 	/* Read PeerProcess.cfg */
@@ -226,14 +227,14 @@ public class PeerProcess implements Runnable {
 		// initialize variables
 		nPieces 	= (int)Math.ceil(fileSize/pieceSize);
 		bitfield 	= new BitSet(nPieces);
-		data 		= new byte[nPieces][pieceSize];
+		fileData 	= new byte[fileSize];
 
 		String 	line		= "";
 		String 	hostname	= "";
 		int 	port 		= 0;
 		boolean hasFile 	= false;
 		String 	peerIDstr 	= "";
-
+		int 	peerId		= 0;
 		try {
 			nPeers 	= getNumPeers();
 			peers 	= new PeerInfo[nPeers];
@@ -245,38 +246,39 @@ public class PeerProcess implements Runnable {
 
 			int i 	= 0;
 			
-			peerIDstr = Integer.toString(peerID);
+			peerIDstr 	= Integer.toString(peerID);
 			while ((line = bufferedReader.readLine()) != null) {
 				StringTokenizer tokens = new StringTokenizer(line);
+				System.out.println(tokens.countTokens());
 
 				if (tokens.countTokens() == 4) {
-					peerID 		= Integer.parseInt(tokens.nextToken());
+					peerId 		= Integer.parseInt(tokens.nextToken());
 					hostname 	= tokens.nextToken();
 					port 		= Integer.parseInt(tokens.nextToken());
-					hasFile 	= (tokens.nextToken() == "1") ? true : false;
+					hasFile 	= tokens.nextToken().charAt(0) == '1' ? true : false;
 					// create new peer and add to array
-					peers[i++] 	= new PeerInfo(peerID, hostname, port, hasFile, nPieces);
-				} else if (tokens.nextToken() == peerIDstr) {
-					hostname 	= tokens.nextToken();
-					port 		= Integer.parseInt(tokens.nextToken());
-					hasFile 	= (tokens.nextToken() == "1") ? true : false;
-				} 
-			}
-			if (hasFile) {
-				// set bitfield to all ones
-				bitfield.set(0,nPieces-1);
+					peers[i++] 	= new PeerInfo(peerId, hostname, port, hasFile, nPieces);
+					if (peerId == peerID) {
+						System.out.println(hasFile);
+						if (hasFile) {
+							// set bitfield to all ones
+							bitfield.set(0,nPieces-1);
 
-				// store data
-				String file = "./peer_" + peerIDstr + "/" + fileName;
-				try {
-					FileInputStream fileInput = new FileInputStream(file);
-					for (int j=0; i<nPieces; j++) {
-						fileInput.read(data[j]);
+							// store data
+							String file = "./peer_" + peerIDstr + "/" + fileName;
+							try {
+								FileInputStream fileInput = new FileInputStream(file);
+								fileInput.read(fileData);
+								System.out.println(fileData.toString());
+							} catch (Exception e) {	 // if file doesn't exist
+								System.out.println(e);
+							}
+						} 
 					}
-				} catch (Exception e) {	 // if file doesn't exist
-					System.out.println(e);
+				} else {
+					System.out.println("Bad input in PeerInfo.cfg");
 				}
-			} 
+			}
 		} catch (Exception e) {
 			System.out.println(e);
 		}		
@@ -697,15 +699,15 @@ public class PeerProcess implements Runnable {
 			pieceIndex /= 16;
 		}
 		for (int i=0; i<pieceSize; i++) {
-			//data[i+4] = pieces[pieceIndex*pieceSize + i]; 
+			data[i+4] = fileData[pieceIndex*pieceSize + i]; 
 		}
 
 		//byte[] piece = pieces[pieceIndex];
 	 
 		Message msg = new Message();
-		//msg.setLength(5 + piece.length);	// SET LENGTH APPROPRIATELY 
+		msg.setLength(data.length);	// SET LENGTH APPROPRIATELY 
 		msg.setType(PIECE);
-		//msg.setPayload(bPieceIndex); 		// AND PIECE CONTENT!
+		msg.setPayload(data); 		// AND PIECE CONTENT!
 		try {
 			msg.send(s);
 		}
