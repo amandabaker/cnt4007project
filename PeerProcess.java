@@ -41,6 +41,7 @@ public class PeerProcess implements Runnable {
 	private byte [][] 	data;
 	private PeerInfo []	peers;
 	private Path 		logPath;
+	private Path 		filePath;
 	private Path 		directoryPath;
 
 	private int 		peerID;						//id for this peer
@@ -213,6 +214,8 @@ public class PeerProcess implements Runnable {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+		// NOTE: THIS MIGHT NOT WORK
+		filePath = Paths.get(fileName);
 	}
 
 	/* Read PeerProcess.cfg */
@@ -785,6 +788,23 @@ public class PeerProcess implements Runnable {
 
 /* ---------- End Write Logs ---------- */
 	
+/* ---------- Write Data to File ---------- */
+
+	void writeToFile (byte[] data) {
+		// check if file exists
+		try{
+			Files.createFile(filePath);
+		} catch (IOException f) {
+			// it might already exist so it's totes fine
+		}
+		// append file
+		try {
+			Files.write(filePath, data, StandardOpenOption.APPEND);
+		} catch (IOException f) {
+			System.out.println(f);
+		}
+	}
+/* ---------- End Write Data to File ---------- */
 
 	/* Main Method */
 	public static void main(String args[]) {
