@@ -65,33 +65,23 @@ public class PeerProcess implements Runnable {
 	public void run() {	
 		
 		//initialize me captain
+		if (peerID == 1001) {
+			startupPeer(peerID);
+		}
+		
+		
 
-		startupPeer(peerID); 
 		//System.out.println("test1");
 		//System.out.println("PeerID is: " + peerID);
-		//configure();
-		//initialize me captain
-		//startupPeer(peerID);
-		 /*
+		configure();
+
 		try {
-			configure();
-			//initialize me captain
-			startupPeer(peerID);
-			System.out.println("test2");
-			//create a socket to connect to the server
-			requestSocket = new Socket("localhost", 8000);//("66.231.144.240", 8080);//
-			System.out.println("test3");
-			System.out.println("Connected to localhost in port 8000");
-			//initialize inputStream and outputStream
+			requestSocket = new Socket("localhost", 8000);
+			 
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
 			out.flush();
 			in = new ObjectInputStream(requestSocket.getInputStream());
-			System.out.println("test4");
-			//get Input from standard input
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-			//first, send a handshake with the peer ID
-			handshake(1002);	//placeholder peer id
-			//Receive the handshake from the server
+
 			MESSAGE = (byte [])in.readObject();
 			//check whether the handshake is valid and if not, no further connection
 			boolean hc = handshakeCheck(MESSAGE);
@@ -102,6 +92,7 @@ public class PeerProcess implements Runnable {
 			while(hc)
 			{
 				System.out.print("Hello, please input a sentence: ");
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 				//read a sentence from the standard input
 				message = bufferedReader.readLine();
 				//translate to bytes --temporary
@@ -118,6 +109,8 @@ public class PeerProcess implements Runnable {
 				String bytestring = new String(MESSAGE, StandardCharsets.UTF_8);
 				
 				System.out.println("Receive message: " + bytestring);
+
+
 			}
 
 		} catch (Exception e) {
@@ -125,8 +118,9 @@ public class PeerProcess implements Runnable {
 			//ostrich algorithm approach to exceptions at its finest
 			System.out.println("whoops");
 		
-		}
-		finally{
+		}	
+
+		finally {
 			//Close connections
 			try{
 				in.close();
@@ -136,7 +130,36 @@ public class PeerProcess implements Runnable {
 			catch(IOException ioException){
 				ioException.printStackTrace();
 			}
-		} */
+		}
+
+	
+
+		
+
+		
+
+		//initialize me captain
+		//startupPeer(peerID);
+		 /*
+		try {
+			configure();
+			//initialize me captain
+			startupPeer(peerID);
+			System.out.println("test2");
+			//create a socket to connect to the server
+			//("66.231.144.240", 8080);//
+			System.out.println("test3");
+			System.out.println("Connected to localhost in port 8000");
+			//initialize inputStream and outputStream
+			
+			System.out.println("test4");
+			//get Input from standard input
+			
+			//first, send a handshake with the peer ID
+			handshake(1002);	//placeholder peer id
+			//Receive the handshake from the server
+			
+		 */
 	}
 
 	/* Startup as server or client */
