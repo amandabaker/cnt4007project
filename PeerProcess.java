@@ -58,11 +58,21 @@ public class PeerProcess implements Runnable {
 	/* Constructor */
 	public PeerProcess(int peerID) {
 		this.peerID = peerID;
+		configure();
 	}
     
 	/* Method run by each thread */
 	public void run() {	
-		System.out.println("test1");
+		
+		//initialize me captain
+
+		startupPeer(peerID); 
+		//System.out.println("test1");
+		//System.out.println("PeerID is: " + peerID);
+		//configure();
+		//initialize me captain
+		//startupPeer(peerID);
+		 /*
 		try {
 			configure();
 			//initialize me captain
@@ -126,15 +136,16 @@ public class PeerProcess implements Runnable {
 			catch(IOException ioException){
 				ioException.printStackTrace();
 			}
-		}
+		} */
 	}
 
 	/* Startup as server or client */
 	public void startupPeer(int peerID) {
-		
 		// Hardcoding first peer to start for now
 		if (peerID == 1001) {
 		
+			System.out.println("Server peer " + peerID + " started.");
+			
 			//spin up a server socket, port hardcoded for now
 			spinServer(8000);
 
@@ -142,6 +153,26 @@ public class PeerProcess implements Runnable {
 			
 			//lets make some friends
 			openConnection();
+			
+			System.out.println("After openConnection: " + peerID);
+			//create a socket to connect to the server
+			//requestSocket = new Socket("localhost", 8000);//("66.231.144.240", 8080);//
+
+			System.out.println("CONNECTING with " + peerID);
+			for(int i = 0; i < nPeers; i++) {
+				if(peers[i].getPeerId() == peerID) {
+					//set the socket
+					peers[i].setSocket(requestSocket);
+					System.out.println("Peer " + peerID + " is done handshaking.");
+					//if loop reaches this peer, break out of loop
+					break;
+				}
+				else {
+					//otherwise, connect with and handshake peer
+					System.out.println("Connecting with peer " + peers[i].getPeerId() + "!");
+					handshake(peers[i].getSocket());
+				}
+			}
 			//TODO:Add arguments to openConnection
 			//openConnection("localhost", 8000);
 			
@@ -352,7 +383,14 @@ public class PeerProcess implements Runnable {
 		//requestSocket = new Socket("localhost", 8000);
 		try {
 			//requestSocket = new Socket("66.231.144.240", 8080);
-			requestSocket = new Socket("localhost", 8000);
+			requestSocket = new Socket("localhost", 8000);	
+			System.out.println("test3");
+			System.out.println("Connected to localhost in port 8000");
+			//initialize inputStream and outputStream
+			out = new ObjectOutputStream(requestSocket.getOutputStream());
+			out.flush();
+			in = new ObjectInputStream(requestSocket.getInputStream());
+			System.out.println("test4");
 		} 
 		catch(Exception e) {
 			System.out.println("exception handling coming in v0.2!!!");
@@ -374,11 +412,11 @@ public class PeerProcess implements Runnable {
 /* ---------- Message Handlers and Helpers ---------- */
 
 	/* Perform handshake */
-	void handshake(int peerid) {
+	void handshake(Socket s) {
 		//convert integer peerID (can change to byte[] if more convenient) to string
-		String pid = Integer.toString(peerid);
+		String pid = Integer.toString(peerID);
 		//add peer id to end of handshake message
-		String hmsg = "P2PFILESHARINGPROJ0000000000" + peerid;
+		String hmsg = "P2PFILESHARINGPROJ0000000000" + pid;
 		
 		//for debugging purposes
 		//System.out.println("peerid: " + peerid);
@@ -386,7 +424,17 @@ public class PeerProcess implements Runnable {
 		//hmsg = "12";
 		//translate from string to byte
 		byte [] b = hmsg.getBytes();
-		
+		//create message
+		Message msg = new Message();
+		msg.setPayload(b);
+		//send message		
+		try {
+			msg.send(s);
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}
+		/*
 		//System.out.println("header bytes: " + b);
 		
 		//System.out.println("header bytes: " + Integer.toBinaryString(b));
@@ -405,6 +453,7 @@ public class PeerProcess implements Runnable {
 		catch(IOException ioException){
 			ioException.printStackTrace();
 		}
+		*/
 	}
 
 	/* Validate handshake */
@@ -464,7 +513,7 @@ public class PeerProcess implements Runnable {
 		int type = msg.getType();
 		int sender = msg.getPeerID();
 		int senderIndex = 0;
-
+/*
 		if (type == BITFIELD) 
 		{
 			//add bitfield to datastructure that tracks each peer's bitfield
@@ -556,6 +605,7 @@ public class PeerProcess implements Runnable {
 				sendNotInterested(peers[senderIndex].getSocket()); //assuming we send to socket
 			}
 		}
+		*/
 	}
 
 /* ---------- Message Handlers and Helpers ---------- */
