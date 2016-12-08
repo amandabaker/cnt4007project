@@ -805,6 +805,21 @@ public class PeerProcess implements Runnable {
 	
 /* ---------- Write Data to File ---------- */
 
+	void writePiece (byte[] data, int pieceIndex) {
+		for (int i=0; i<pieceSize; i++) {
+			fileData[pieceIndex*pieceSize + i] = data[i];
+		}
+	}
+
+	void setBitInBitfield (int pieceIndex) {
+		bitfield.set(pieceIndex);
+		bitfield.flip(0,bitfield.length());
+		if (bitfield.isEmpty()) {
+			// write piece to file
+		}
+		bitfield.flip(0,bitfield.length());
+	}
+
 	void writeToFile (byte[] data) {
 		// check if file exists
 		try{
@@ -814,11 +829,12 @@ public class PeerProcess implements Runnable {
 		}
 		// append file
 		try {
-			Files.write(filePath, data, StandardOpenOption.APPEND);
+			Files.write(filePath, data);
 		} catch (IOException f) {
 			System.out.println(f);
 		}
 	}
+
 /* ---------- End Write Data to File ---------- */
 
 	/* Main Method */
