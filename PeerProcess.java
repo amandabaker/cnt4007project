@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.lang.*;
 import java.math.BigInteger;
+import java.time.LocalTime;
 
 public class PeerProcess implements Runnable {
 
@@ -38,6 +39,8 @@ public class PeerProcess implements Runnable {
 	private BitSet 		bitfield;
 	private byte [][] 	data;
 	private PeerInfo []	peers;
+	private Path 		logPath;
+	private Path 		directoryPath;
 
 	private int 		peerID;						//id for this peer
 	private byte [] 	MESSAGE;
@@ -143,6 +146,33 @@ public class PeerProcess implements Runnable {
 	}
 
 /* ---------- Configuration ---------- */
+
+	void configure () {
+		String nameLogFile 	= "log_peer_" + Integer.toString(theirPeerID) + ".log";
+		String nameDirectory= "peer_" + Integer.toString(theirPeerID);
+		
+		logPath			= Paths.get (nameLogFile);
+		directorPath	= Paths.get (nameDirectory);
+
+		try {
+			Files.createFile (logPath);
+		} catch (IOException f) {
+			System.out.println("The log file for " + Integer.toString(theirPeerID) + " already exists. \n" +
+							   "The old file will be appended with new data.");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+		// Create storage directory
+		try {
+			Files.createDirectory (directory);
+		} catch (IOException f) {
+			System.out.println("The log directory for " + Integer.toString(theirPeerID) + " already exists. \n" + 
+							   "The old directory will be kept and any new files added here.");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
 	/* Read Common.cfg */
 	void configureGeneral () {
 		try {
@@ -674,10 +704,83 @@ public class PeerProcess implements Runnable {
 		return new BigInteger(meslen).intValue();
 		
 	}
-	
-	/* TODO: Write logs */
 
-	/*  */
+/* ---------- Write Logs ---------- */
+
+	/* Writer for all cases */
+	void writeLog (Path logPath, String logData) {
+		try {
+			Files.write(logPath, logData, StandardOpenOperation.APPEND);
+		} catch (IOException f) {
+			System.out.println("Cannot print \"" + logData + "\" to " + logPath);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	void logTCP (LocalTime time, int theirPeerID) {
+		String peer1 = Integer.toString(peerID);
+		String peer2 = Integer.toString(theirPeerID);
+		String logData = time.toString() + ": Peer " + peer1 + " makes a connection to Peer " + peer2 + ".";
+		writeLog(logPath, logData);
+	}
+
+	void logChangeOfPreferredNeighbors (LocalTime time, int [] preferredPeerIDs) {
+		String logData = time.toString() + ": Peer " + peer1 + " has the preferred neighbors";
+		if (preferredPeerIDs.length() > 0) {
+			logData += " " + preferredPeerIDs[0];
+		}
+		for (int i=1; i<preferredPeerIDs.length(); i++) {
+			logData += ", " + preferredPeerIDs[i];
+		}
+		logData += ".";
+		writeLog(logPath, logData);
+	}
+
+	void logChangeOfOptimisticallyUnchokedNeighbor (LocalTime time, int theirPeerID) {
+		String logData = time.toString() + ": Peer " + peerID + " has the optimistically unchoked neighbor " + theirPeerID + ".";
+		writeLog(logPath, logData);
+	}
+
+	void logUnchoking (LocalTime time, int theirPeerID) {
+
+		String logData = time.toString() + ": Peer " + peerID + " is unchoked by " + theirPeerID + ".";
+		writeLog(logPath, logData);
+	}
+
+	void logChoking (LocalTime time, int theirPeerID) {
+
+		String logData = time.toString() + ": Peer " + peerID + " is choked by " + theirPeerID + ".";
+		writeLog(logPath, logData);
+	}
+
+	void logHave (LocalTime time, int theirPeerID, int pieceIndex) {
+		String logData = time.toString() + ": Peer " + peerID + " received the 'have' message from " + theirPeerID + " for the piece " + pieceIndex + ".";
+		writeLog(logPath, logData);
+	}
+
+	void logInterested (LocalTime time, int theirPeerID) {
+		String logData = time.toString() + ": Peer " + peerID + " received the 'interested' message from " + theirPeerID ".";
+		writeLog(logPath, logData);
+	}
+
+	void logNotInterested (LocalTime time, int theirPeerID) {
+		String logData = time.toString() + ": Peer " + peerID + " received the 'not interested' message from " + theirPeerID ".";
+		writeLog(logPath, logData);
+	}
+
+	void logDownloadingPiece (LocalTime time, int theirPeerID, int pieceIndex) {
+		String logData = time.toString() + ": Peer " + peerID + " has downloaded the piece " + pieceIndex + " from " + theirPeerID + ".";
+		writeLog(logPath, logData);
+	}
+
+	void logCompletionOfDownload (LocalTime time, int theirPeerID) {
+		String logData = time.toString() + ": Peer " + peerID + " has downloaded the complete file.";
+		writeLog(logPath, logData);
+	}
+
+/* ---------- End Write Logs ---------- */
+	
 
 	/* Main Method */
 	public static void main(String args[]) {
