@@ -464,34 +464,39 @@ public class PeerProcess implements Runnable {
 		
 	}
 
-	/* Check the type of the recieved message and act accordingly */
 	void messageType(Message msg) {
 		//check message type bit
 		int type = msg.getType();
-		//int sender = msg.getPeerID();
+		int sender = msg.getPeerID();
+		int senderIndex = 0;
 
 		if (type == BITFIELD) 
 		{
 			//add bitfield to datastructure that tracks each peer's bitfield
 			//compare to this peer's bitfield to see if there is any interest
 			//send interested/not interested
-		/*	
+		
 			//update sender's bitfield
-			peers[sender].setTheirBitField(senderField); //peers[] is an array of PeerInfo instances, one for each neighbor
-			boolean check = checkInterest(senderField);
-			check ? sendInterested(peers[sender].getSocket()) : sendUninterested(peers[sender].getSocket()); //assuming we send to socket, idk
-		*/
+
+			peers[senderIndex].setTheirBitField(extractBitfield(msg.getPayload())); //peers[] is an array of PeerInfo instances, one for each neighbor
+			boolean check = checkInterest(msg.getPayload());
+			if (check) {
+				sendInterested(peers[senderIndex].getSocket()); 
+			} else {
+				sendNotInterested(peers[senderIndex].getSocket()); //assuming we send to socket, idk
+			}
+		
 		}
 		else if (type == INTERESTED) 
 		{
 			//update this peer's info about sender to include that sender is interested in this peer's data
-			//peers[sender].setInterested(true);
+			peers[senderIndex].setTheirInterest(true);
 
 		}
 		else if (type == NOT_INTERESTED) 
 		{
 			//set sender's interest in this peer to false
-			//peers[sender].setInterested(false);
+			peers[senderIndex].setTheirInterest(false);
 		}
 		else if (type == CHOKE) 
 		{
@@ -501,20 +506,22 @@ public class PeerProcess implements Runnable {
 		else if (type == UNCHOKE)
 		{
 			// check if still interested, then send requests
-		/*	
-			ArrayList<int> want = findWantedPieces(sender);
+			
+			ArrayList<Integer> want = findWantedPieces(senderIndex);
 			//if there are no wanted pieces, send an uninterested message
 			//else send a request for a random piece that this peer doesn't have
-			want.isEmpty() ? sendUninterested(peers[sender].getSocket()) : sendRequest(sender, getRandomPiece());
-
-		*/
+			if (want.isEmpty()) {
+				sendNotInterested(peers[senderIndex].getSocket());
+			} else {
+				sendRequest(peers[senderIndex].getSocket(), getRandomIndex(senderIndex));
+			}
+		
 		}
 		else if (type == REQUEST) 
 		{
 			//send piece message back with requested piece
-		/*
-			sendPiece(sender, data[msg.getRequestIndex()]);
-		*/
+			sendPiece( peers[senderIndex].getSocket(), extractIndex(msg.getPayload()) );
+		
 		}
 		else if (type == PIECE)
 		{
@@ -523,56 +530,40 @@ public class PeerProcess implements Runnable {
 			//check if still interested in current peer, if yes request
 			//else send not interested
 			//finally check to see if file is complete, if yes enter random selected neighbors mode
-		/*	
+			
 			//Add piece to data, broadcast updated bitfield
-			data[msg.getPieceId()] = msg.getPayLoad();
-			for(peer : peers) {
-				sendHave(peer, bitfield);
+			data[extractIndex(msg.getPayload())] = msg.getPayload();
+			for(int i = 0; i < (nPeers - 1); i++) {
+				sendHave(peers[i].getSocket(), extractIndex(msg.getPayload()));
 			}
 				
 			// check if still interested, then send requests
-			ArrayList<int> want = findWantedPieces(sender);
+			ArrayList<Integer> want = findWantedPieces(senderIndex);
 			//if there are no wanted pieces, send an uninterested message
 			//else send a request for a random piece that this peer doesn't have
-			want.isEmpty() ? sendUninterested(peers[sender].getSocket()) : sendRequest(sender, getRandomPiece());
-		*/
+			if (want.isEmpty()) {
+				sendNotInterested(peers[senderIndex].getSocket());
+			} else {
+				sendRequest(peers[senderIndex].getSocket(), getRandomIndex(senderIndex));
+			}
 		}
 		else if (type == HAVE) 
 		{
 			//update tracked bitfield for sender
 			//reevaluate interest/non-interest
-		/*	
+		
 			//update sender's bitfield
-			peers[sender].setTheirBitField(senderField); //peers[] is an array of PeerInfo instances, one for each neighbor
-			boolean check = checkInterest(senderField);
-			check ? sendInterested(peers[sender].getSocket()) : sendUninterested(peers[sender].getSocket()); //assuming we send to socket, idk
-		*/
-		}
-	}
-
- 	/*
-	boolean checkInterest(BitSet senderField) {
-		for (piece : senderField) {
-			if (bitfield[piece] == senderField[piece]) {
-				return true;	//there's at least one piece this peer is interested in
+			peers[senderIndex].setTheirBitField(extractBitfield(msg.getPayload())); //peers[] is an array of PeerInfo instances, one for each neighbor
+			boolean check = checkInterest(msg.getPayload());
+			if (check) {
+				sendInterested(peers[senderIndex].getSocket());
+			} else {
+				sendNotInterested(peers[senderIndex].getSocket()); //assuming we send to socket
 			}
 		}
-
-		return false;	//there's nothing the sender has that this peer wants
 	}
 
-	ArrayList<int> findWantedPieces(BitSet senderField) {
-		ArrayList<int> want = new ArrayList<int>();
-		for (piece : senderField) {
-			if ((bitfield[piece] != senderField[piece]) && (senderField[piece] == 1)) {
-				want.add(piece);	//append the index of the piece they have that we want
-			}
-		}
-		return want;
-	}
-	*/
-
-/* ---------- End Message Handlers and Helpers ---------- */
+/* ---------- Message Handlers and Helpers ---------- */
 
 /* ---------- Send messages ---------- */
 
