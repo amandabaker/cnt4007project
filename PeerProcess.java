@@ -161,8 +161,7 @@ public class PeerProcess implements Runnable {
 		try {
 			Files.createFile (logPath);
 		} catch (IOException f) {
-			System.out.println("The log file for " + peerID + " already exists. \n" +
-							   "The old file will be appended with new data.");
+			System.out.println("The log file for " + peerID + " already exists.";
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -171,16 +170,13 @@ public class PeerProcess implements Runnable {
 		try {
 			Files.createDirectory (directoryPath);
 		} catch (IOException f) {
-			System.out.println("The log directory for " + peerID + " already exists. \n" + 
-							   "The old directory will be kept and any new files added here.");
+			System.out.println("The log directory for " + peerID + " already exists. ";
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 
 		configureGeneral();
 		configurePeer();
-
-		System.out.println("Config complete");
 	}
 
 	/* Read Common.cfg */
@@ -219,7 +215,6 @@ public class PeerProcess implements Runnable {
 		}
 		// NOTE: THIS MIGHT NOT WORK
 		filePath = Paths.get(fileName);
-		System.out.println(filePath.toString());
 	}
 
 	/* Read PeerProcess.cfg */
