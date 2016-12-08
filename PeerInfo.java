@@ -102,4 +102,7 @@ public class PeerInfo {
 	public void setOptimistic(boolean a) {
 		theirOptimistic = a;
 	}	
+	public void setSocket(Socket a) {
+		theirSocket = a;
+	}
 }
