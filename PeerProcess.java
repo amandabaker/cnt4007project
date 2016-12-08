@@ -558,6 +558,24 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
+	int getRandomIndex(int peerIndex) {
+		while (true) {
+			int i =(int)(Math.random() * bitfield.length());
+			if (bitfield.get(i) == false && peers[peerIndex].getBitField().get(i) == true) {
+				return i;
+			}
+		}
+	}
+
+	int getIndex (byte[] payload) {
+		int index = 0;
+		for (int i=0; i<4; i++) {
+			index *= 16;
+			index += Byte.valueOf(payload[i]).intValue();
+		}
+		return index;
+	}
+
 /* ---------- Message Handlers and Helpers ---------- */
 
 /* ---------- Send messages ---------- */
