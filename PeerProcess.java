@@ -64,6 +64,7 @@ public class PeerProcess implements Runnable {
 	public void run() {	
 		System.out.println("test1");
 		try {
+			configure();
 			//initialize me captain
 			startupPeer(peerID);
 			System.out.println("test2");
@@ -178,6 +179,8 @@ public class PeerProcess implements Runnable {
 
 		configureGeneral();
 		configurePeer();
+
+		System.out.println("Config complete");
 	}
 
 	/* Read Common.cfg */
@@ -189,28 +192,28 @@ public class PeerProcess implements Runnable {
 			String line;
 
 			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			numberOfPerferredNeighbors = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+			tokens = (line != null) ? new StringTokenizer(line) : null;
+			numberOfPerferredNeighbors = (tokens != null && tokens.nextToken() != "") ? Integer.parseInt(tokens.nextToken()) : null;
 
 			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			unchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()): null;
+			tokens = (line != null) ? new StringTokenizer(line) : null;
+			unchokingInterval = (tokens != null && tokens.nextToken() != "") ? Integer.parseInt(tokens.nextToken()) : null;
 
 			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			optimisticUnchokingInterval = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+			tokens = (line != null) ? new StringTokenizer(line) : null;
+			optimisticUnchokingInterval = (tokens != null && tokens.nextToken() != "") ? Integer.parseInt(tokens.nextToken()) : null;
 
 			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			fileName = tokens != null ? tokens.nextToken() : null;	
+			tokens = (line != null) ? new StringTokenizer(line) : null;
+			fileName = (tokens != null && tokens.nextToken() != "") ? tokens.nextToken() : null;	
 
 			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			fileSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+			tokens = (line != null) ? new StringTokenizer(line) : null;
+			fileSize = (tokens != null && tokens.nextToken() != "") ? Integer.parseInt(tokens.nextToken()) : null;
 
 			line = bufferedReader.readLine();
-			tokens = line != null ? new StringTokenizer(line) : null;
-			pieceSize = tokens != null ? Integer.parseInt(tokens.nextToken()) : null;
+			tokens = (line != null) ? new StringTokenizer(line) : null;
+			pieceSize = (tokens != null && tokens.nextToken() != "") ? Integer.parseInt(tokens.nextToken()) : null;
 		} catch (Exception e) {
 			System.out.println(e);
 		}
