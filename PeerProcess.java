@@ -527,7 +527,9 @@ public class PeerProcess implements Runnable {
 			//finally check to see if file is complete, if yes enter random selected neighbors mode
 			
 			//Add piece to data, broadcast updated bitfield
-			data[extractIndex(msg.getPayload())] = msg.getPayload();
+			
+			/**/
+
 			for(int i = 0; i < (nPeers - 1); i++) {
 				sendHave(peers[i].getSocket(), extractIndex(msg.getPayload()));
 			}
@@ -567,7 +569,7 @@ public class PeerProcess implements Runnable {
 		}
 	}
 
-	int getIndex (byte[] payload) {
+	int extractIndex (byte[] payload) {
 		int index = 0;
 		for (int i=0; i<4; i++) {
 			index *= 16;
@@ -578,7 +580,7 @@ public class PeerProcess implements Runnable {
 
 	boolean checkInterest(int index) {
 		BitSet bf = peers[index].getBitField();
-		for (int i = 0; i < bf.length; i++) {
+		for (int i = 0; i < bf.length(); i++) {
 			if ((bitfield.get(i) == bf.get(i)) && (bf.get(i) == true)) {
 				return true;	//there's at least one piece this peer is interested in
 			}
@@ -588,12 +590,23 @@ public class PeerProcess implements Runnable {
 	ArrayList<Integer> findWantedPieces(int index) {
 		BitSet bf = peers[index].getBitField();
 		ArrayList<Integer> want = new ArrayList<Integer>();
-		for (int i = 0; i < peers; i++) {
+		for (int i = 0; i < bf.length(); i++) {
 			if ((bitfield.get(i) != bf.get(i)) && (bf.get(i) == true)) {
 				want.add(i);	//append the index of the piece they have that we want
 			}
 		}
 		return want;
+	}
+
+	//converts a bitfield message payload into a bitset
+	BitSet extractBitfield(byte[] payload) {
+		BitSet bf = new BitSet();
+		for(int i = 0; i < payload.length; i++) {
+			if (payload[i] == 1) {
+				bf.set(i);
+			}
+		}
+		return bf;
 	}
 
 /* ---------- Message Handlers and Helpers ---------- */
